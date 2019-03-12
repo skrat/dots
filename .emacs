@@ -16,10 +16,13 @@
 (show-paren-mode 1)
 (setq debug-on-error t)
 
-(defun load-init-el ()
+(defun skrat/load-init-el ()
   "Reload init.el configuration."
   (interactive)
-  (load-file "~/.emacs.d/init.el"))
+  (load-file "~/.emacs"))
+
+(setq backup-directory-alist `(("." . "~/.emacs.d/saves")))
+(setq backup-by-copying t)
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
@@ -67,7 +70,8 @@
 (use-package company
   :ensure t
   :config
-  (setq company-idle-delay 0))
+  (setq company-idle-delay 0)
+  (global-company-mode 1))
 
 (use-package counsel
   :ensure t
@@ -89,16 +93,19 @@
 (use-package evil
   :ensure t
   :init
+  (setq evil-want-keybinding nil)
+  :config
   (evil-mode))
 
 (use-package evil-collection
   :ensure t
-  :init
+  :config
   (evil-collection-init))
 
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode))
+  :config
+  (global-flycheck-mode))
 
 (use-package general
   :ensure t
@@ -118,7 +125,7 @@
   (leader-def
     "`" '(save-buffer :which-key "write")
     "SPC" '(avy-goto-word-or-subword-1 :which-key "avy")
-    "ESC" '(load-init-el :which-key "reload")
+    "ESC" '(skrat/load-init-el :which-key "reload")
     "TAB" '(other-window :which-key "other")
     "b" '(nil :which-key "buffer")
     "bb" '(counsel-switch-buffer :which-key "switch")
@@ -139,7 +146,8 @@
     "ee" '(eval-last-sexp :which-key "last-sexp")
     "ef" '(eval-defun :which-key "defun")
     "h" '(nil :which-key "help")
-    "hm" 'man))
+    "hm" 'man
+    "s" '(nil :which-key "symbol")))
 
 (use-package auto-highlight-symbol
   :ensure t
@@ -155,7 +163,7 @@
    :background (face-attribute 'default :background)
    :foreground nil
    :underline nil)
-  (leader-def
+  (code-def
     "se" '(ahs-edit-mode :which-key "edit")))
 
 (use-package ivy
@@ -192,6 +200,12 @@
   :ensure t
   :config
   (smart-mode-line-enable))
+
+(use-package sublimity
+  :ensure t
+  :config
+  (require 'sublimity-scroll)
+  (sublimity-mode 1))
 
 (use-package swiper
   :ensure t

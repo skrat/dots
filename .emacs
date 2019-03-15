@@ -86,6 +86,11 @@
   (setq company-idle-delay 0)
   (global-company-mode 1))
 
+(defun counsel-ag-at-point ()
+  "Ag symbol at point."
+  (interactive)
+  (counsel-ag (thing-at-point 'symbol)))
+
 (use-package counsel
   :ensure t
   :bind*                           ; load counsel when pressed
@@ -94,14 +99,9 @@
    ("C-x C-r" . counsel-recentf)   ; search recently edited files
    ("C-c f"   . counsel-git)       ; search for files in git repo
    ("C-c s"   . counsel-git-grep)  ; search for regexp in git repo
-   ("C-c /"   . counsel-ag)        ; search for regexp in git repo using ag
+   ("C-c /"   . counsel-ag-at-point) ; search for regexp in git repo using ag
    ("C-c l"   . counsel-locate))   ; search for files or else using locate
   )
-
-(defun counsel-ag-at-point ()
-  "Ag symbol at point."
-  (interactive)
-  (counsel-ag (thing-at-point 'symbol)))
 
 (use-package evil
   :ensure t
@@ -195,6 +195,9 @@
   (setq ivy-format-function 'ivy-format-function-arrow)
   (setq ivy-display-style 'fancy))
 
+(use-package ivy-hydra
+  :ensure t)
+
 (use-package helpful
   :ensure t
   :config
@@ -253,7 +256,8 @@
   (setq magit-completing-read-function 'ivy-completing-read)
   (leader-def
     "g" '(nil :which-key "git")
-    "gs" '(magit-status :which-key "git status")))
+    "gs" '(magit-status :which-key "status")
+    "gb" '(magit-blame :which-key "blame")))
 
 (use-package evil-magit
   :ensure t)
@@ -261,7 +265,8 @@
 (use-package diff-hl
   :ensure t
   :hook
-  ((magit-post-refresh-hook . diff-hl-magit-post-refresh))
+  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
+   (magit-refresh-buffer-hook . diff-hl-magit-post-refresh))
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
@@ -271,12 +276,14 @@
   (set-face-attribute 'diff-hl-delete nil :background (darken 'diff-hl-delete :foreground 30))
   (general-define-key
    "M-n" 'diff-hl-next-hunk
-   "M-m" 'diff-hl-previous-hunk))
+   "M-m" 'diff-hl-previous-hunk)
+  (leader-def
+    "gr" '(diff-hl-revert-hunk :which-key "revert-hunk")))
 
 (use-package evil-goggles
   :ensure t
   :config
-  (setq evil-goggles-blocking-duration 0.1)
+  (setq evil-goggles-blocking-duration 0.05)
   (set-face-attribute 'evil-goggles-delete-face nil :background (color-darken-name "red3" 30))
   (set-face-attribute 'evil-goggles-paste-face nil :background (color-darken-name "#edb443" 50)))
 

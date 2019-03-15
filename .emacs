@@ -8,6 +8,13 @@
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
 
+(defun skrat/disable-scroll-bars (frame)
+  "Disable scroll bars on new FRAME."
+  (modify-frame-parameters
+   frame '((vertical-scroll-bars . nil)
+	   (horizontal-scroll-bars . nil))))
+(add-hook 'after-make-frame-functions 'skrat/disable-scroll-bars)
+
 ;; Settings
 
 (savehist-mode 1)
@@ -15,6 +22,7 @@
 (recentf-mode 1)
 (show-paren-mode 1)
 (setq debug-on-error t)
+(setq vc-follow-symlinks t)
 
 (defun skrat/load-init-el ()
   "Reload init.el configuration."
@@ -25,6 +33,7 @@
 (setq backup-by-copying t)
 
 (setq custom-file "~/.emacs.d/custom.el")
+(shell-command (format "touch %s" custom-file))
 (load custom-file)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -61,6 +70,10 @@
  :height 90
  :weight 'normal
  :width 'normal)
+
+(defun darken (face attribute pct)
+  "Darker color of the FACE ATTRIBUTE by PCT."
+  (color-darken-name (face-attribute face attribute) pct))
 
 ;; Core
 
@@ -127,6 +140,7 @@
     "SPC" '(avy-goto-word-or-subword-1 :which-key "avy")
     "ESC" '(skrat/load-init-el :which-key "reload")
     "TAB" '(other-window :which-key "other")
+    "RET" 'make-frame
     "b" '(nil :which-key "buffer")
     "bb" '(counsel-switch-buffer :which-key "switch")
     "bd" '(kill-buffer :which-key "kill")
@@ -134,8 +148,9 @@
     "bk" '(previous-buffer :which-key "prev")
     "f" '(nil :which-key "file")
     "ff" '(counsel-find-file :which-key "find")
+    "r" '(nil :which-key "refactor")
     "s" '(nil :which-key "symbol")
-    "ss" '(counsel-ag-at-point :which-key "ag")
+    "sj" '(counsel-semantic-or-imenu :which-key "jump")
     "w" '(nil :which-key "window")
     "w1" '(delete-other-windows :which-key "max")
     "wd" '(delete-window :which-key "kill"))
@@ -144,6 +159,7 @@
     "e" '(nil :which-key "eval")
     "eb" '(eval-buffer :which-key "buffer")
     "ee" '(eval-last-sexp :which-key "last-sexp")
+    "er" '(eval-region :which-key "region")
     "ef" '(eval-defun :which-key "defun")
     "h" '(nil :which-key "help")
     "hm" 'man
@@ -153,16 +169,13 @@
   :ensure t
   :config
   (setq ahs-idle-interval 0)
-  (set-face-attribute
-   ahs-face nil
-   :underline nil
-   :background (color-lighten-name (face-attribute 'default :background) 10)
-   :foreground nil)
-  (set-face-attribute
-   ahs-plugin-defalt-face nil
-   :background (face-attribute 'default :background)
-   :foreground nil
-   :underline nil)
+  (custom-set-faces
+   `(ahs-face
+     ((t (:background ,(color-lighten-name (face-attribute 'default :background) 10)
+		      :underline nil :foreground nil))))
+   `(ahs-plugin-defalt-face
+     ((t (:background ,(face-attribute 'default :background)
+		      :underline nil :foreground nil)))))
   (code-def
     "se" '(ahs-edit-mode :which-key "edit")))
 
@@ -179,6 +192,7 @@
   (setq ivy-ignore-buffers '("\*.+\*"))
   (setq ivy-height 20)
   (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-format-function 'ivy-format-function-arrow)
   (setq ivy-display-style 'fancy))
 
 (use-package helpful
@@ -195,6 +209,13 @@
   (leader-def
     "p" '(projectile-command-map :which-key "project"))
   (projectile-mode +1))
+
+(use-package counsel-projectile
+  :ensure t
+  :config
+  (counsel-projectile-mode 1)
+  (leader-def
+    "ss" '(counsel-projectile-ag :which-key "ag")))
 
 (use-package smart-mode-line
   :ensure t
@@ -239,11 +260,25 @@
 
 (use-package diff-hl
   :ensure t
-  :init
-  (global-diff-hl-mode)
-  :hook ((magit-post-refresh-hook . diff-hl-magit-post-refresh))
+  :hook
+  ((magit-post-refresh-hook . diff-hl-magit-post-refresh))
   :config
-  (diff-hl-flydiff-mode))
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode)
+  (set-face-attribute 'diff-hl-change nil :foreground "#edb443")
+  (set-face-attribute 'diff-hl-change nil :background (darken 'diff-hl-change :foreground 50))
+  (set-face-attribute 'diff-hl-insert nil :background (darken 'diff-hl-insert :foreground 30))
+  (set-face-attribute 'diff-hl-delete nil :background (darken 'diff-hl-delete :foreground 30))
+  (general-define-key
+   "M-n" 'diff-hl-next-hunk
+   "M-m" 'diff-hl-previous-hunk))
+
+(use-package evil-goggles
+  :ensure t
+  :config
+  (setq evil-goggles-blocking-duration 0.1)
+  (set-face-attribute 'evil-goggles-delete-face nil :background (color-darken-name "red3" 30))
+  (set-face-attribute 'evil-goggles-paste-face nil :background (color-darken-name "#edb443" 50)))
 
 ;; LISP
 
@@ -265,15 +300,21 @@
     "eb" '(cider-eval-buffer :which-key "buffer")
     "ee" '(cider-eval-sexp-at-point :which-key "sexp-at-point")
     "ef" '(cider-eval-defun-at-point :which-key "defun-at-point")
-    "hh" '(cider-doc :which-key "cider-doc"))
+    "ep" '(cider-pprint-eval-defun-at-point :which-key "pp-defun-at-point")
+    "er" '(cider-eval-region :which-key "region")
+    "hh" '(cider-doc :which-key "doc")
+    "hj" '(cider-javadoc :which-key "javadoc"))
   (general-define-key
-    "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
+   :keymap clojure-mode-map
+   "M-RET" 'cider-eval-defun-at-point
+   "M-S-RET" 'cider-pprint-eval-defun-at-point
+   "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
 
 (use-package eval-sexp-fu
   :ensure t)
 
-(use-package cider-eval-sexp-fu
-  :ensure t)
+;; (use-package cider-eval-sexp-fu
+;;   :ensure t)
 
 (use-package clj-refactor
   :ensure t
@@ -281,7 +322,9 @@
 	 (clojure-mode . yas-minor-mode))
   :config
   (code-def clojure-mode-map
-    "r" '(nil :which-key "refactor"))
+    "rt" '(nil :which-key "thread")
+    "rtf" '(clojure-thread-first-all :which-key "first-all")
+    "rtl" '(clojure-thread-last-all :which-key "first-all"))
   (dolist (details cljr--all-helpers)
     (let ((key (car details))
           (fn (cadr details)))
@@ -300,6 +343,20 @@
 
 ;; Rest
 
+(defun skrat/gradle-installDebug ()
+  "Android: Run gradle installDebug."
+  (interactive)
+  (gradle-execute "installDebug"))
+
+(use-package gradle-mode
+  :ensure t
+  :config
+  (code-def
+    "bi" '(skrat/gradle-installDebug :which-key "gradle-installDebug")))
+
+(use-package kotlin-mode
+  :ensure t)
+
 (use-package tex
   :ensure auctex)
 
@@ -309,5 +366,11 @@
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
+
+(use-package csharp-mode
+  :ensure t)
+
+(use-package omnisharp
+  :ensure t)
 
 (provide 'init)

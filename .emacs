@@ -85,9 +85,13 @@
  :weight 'normal
  :width 'normal)
 
-(defun darken (face attribute pct)
+(defun skrat/darken (face attribute pct)
   "Darker color of the FACE ATTRIBUTE by PCT."
   (color-darken-name (face-attribute face attribute) pct))
+
+(defun skrat/lighten (face attribute pct)
+  "Lighter color of the FACE ATTRIBUTE by PCT."
+  (color-lighten-name (face-attribute face attribute) pct))
 
 ;; Core
 
@@ -129,11 +133,6 @@
   :ensure t
   :config
   (evil-collection-init))
-
-(use-package evil-anzu
-  :ensure t
-  :config
-  (global-anzu-mode +1))
 
 (use-package flycheck
   :ensure t
@@ -187,26 +186,26 @@
     "hm" 'man
     "s"  '(nil :which-key "symbol")))
 
-(use-package auto-highlight-symbol
+(use-package fill-column-indicator
   :ensure t
   :config
-  (setq ahs-idle-interval 0)
-  (custom-set-faces
-   `(ahs-face
-     ((t (:background ,(color-lighten-name (face-attribute 'default :background) 10)
-          :underline nil :foreground nil))))
-   `(ahs-plugin-defalt-face
-     ((t (:background ,(face-attribute 'default :background)
-          :underline nil :foreground nil)))))
+  (setq fci-rule-color (skrat/lighten 'default :background 10))
+  (leader-def
+    "tf" '(fci-mode :which-key "fci")))
+
+(use-package evil-anzu
+  :ensure t
+  :config
+  (global-anzu-mode +1)
   (code-def
-    "se" '(ahs-edit-mode :which-key "edit")))
+    "se" '(anzu-query-replace-at-cursor-thing :which-key "edit")))
 
 (use-package highlight-symbol
   :ensure t
   :config
   (setq highlight-symbol-idle-delay 0)
   (set-face-attribute
-   'highlight-symbol-face nil :background (face-attribute hl-line-face :background))
+   'highlight-symbol-face nil :background (skrat/lighten 'default :background 10))
   :hook
   ((prog-mode-hook . highlight-symbol-mode)))
 
@@ -324,9 +323,9 @@
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
   (set-face-attribute 'diff-hl-change nil :foreground "#edb443")
-  (set-face-attribute 'diff-hl-change nil :background (darken 'diff-hl-change :foreground 50))
-  (set-face-attribute 'diff-hl-insert nil :background (darken 'diff-hl-insert :foreground 30))
-  (set-face-attribute 'diff-hl-delete nil :background (darken 'diff-hl-delete :foreground 30))
+  (set-face-attribute 'diff-hl-change nil :background (skrat/darken 'diff-hl-change :foreground 50))
+  (set-face-attribute 'diff-hl-insert nil :background (skrat/darken 'diff-hl-insert :foreground 30))
+  (set-face-attribute 'diff-hl-delete nil :background (skrat/darken 'diff-hl-delete :foreground 30))
   (general-define-key
    "M-n" 'diff-hl-next-hunk
    "M-m" 'diff-hl-previous-hunk)
@@ -368,7 +367,7 @@
   (general-define-key
    :keymap clojure-mode-map
    "M-RET" 'cider-eval-defun-at-point
-   "M-S-RET" 'cider-pprint-eval-defun-at-point
+   [(meta shift return)] 'cider-pprint-eval-defun-at-point
    "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
 
 (use-package eval-sexp-fu

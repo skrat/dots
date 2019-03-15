@@ -3,6 +3,7 @@
 ;;; Code:
 
 ;; GUI
+
 
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
@@ -16,6 +17,7 @@
 (add-hook 'after-make-frame-functions 'skrat/disable-scroll-bars)
 
 ;; Settings
+
 
 (savehist-mode 1)
 (desktop-save-mode 1)
@@ -40,6 +42,7 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Packages
+
 
 (require 'color)
 (require 'package)
@@ -47,6 +50,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+(package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -56,7 +60,16 @@
   (require 'use-package))
 (require 'bind-key)
 
+(use-package quelpa
+  :ensure t)
+
+(use-package quelpa-use-package
+  :ensure t)
+
+(setq use-package-ensure-function 'quelpa)
+
 ;; Theme
+
 
 (use-package gotham-theme
   :ensure t
@@ -77,6 +90,7 @@
   (color-darken-name (face-attribute face attribute) pct))
 
 ;; Core
+
 
 (use-package avy
   :ensure t)
@@ -222,6 +236,11 @@
     "hh" 'helpful-at-point)
   (evil-define-key 'normal helpful-mode-map "q" 'delete-window))
 
+(use-package page-break-lines
+  :ensure t
+  :config
+  (global-page-break-lines-mode +1))
+
 (use-package projectile
   :ensure t
   :config
@@ -265,7 +284,24 @@
         which-key-idle-delay 0.05)
   :diminish which-key-mode)
 
+(use-package frame-fns
+  :ensure t
+  :quelpa (frame-fns :fetcher github :repo "emacsmirror/frame-fns"))
+
+(use-package frame-cmds
+  :ensure t
+  :quelpa (frame-cmds :fetcher github :repo "emacsmirror/frame-cmds"))
+
+(use-package zoom-frm
+  :ensure t
+  :quelpa (zoom-frm :fetcher github :repo "emacsmirror/zoom-frm")
+  :config
+  (general-define-key
+   "C-=" 'zoom-frm-in
+   "C--" 'zoom-frm-out))
+
 ;; Git
+
 
 (use-package magit
   :ensure t
@@ -305,6 +341,7 @@
   (set-face-attribute 'evil-goggles-paste-face nil :background (color-darken-name "#edb443" 50)))
 
 ;; LISP
+
 
 (use-package clojure-mode
   :ensure t
@@ -366,6 +403,7 @@
 	 (clojure-mode . rainbow-delimiters-mode)))
 
 ;; Rest
+
 
 (defun skrat/gradle-installDebug ()
   "Android: Run gradle installDebug."

@@ -23,6 +23,7 @@
 (show-paren-mode 1)
 (setq debug-on-error t)
 (setq vc-follow-symlinks t)
+(setq mouse-autoselect-window t)
 
 (defun skrat/load-init-el ()
   "Reload init.el configuration."
@@ -115,6 +116,11 @@
   :config
   (evil-collection-init))
 
+(use-package evil-anzu
+  :ensure t
+  :config
+  (global-anzu-mode +1))
+
 (use-package flycheck
   :ensure t
   :config
@@ -136,34 +142,36 @@
    :prefix ","
    :non-normal-prefix "C-,")
   (leader-def
-    "`" '(save-buffer :which-key "write")
+    "`"   '(save-buffer :which-key "write")
     "SPC" '(avy-goto-word-or-subword-1 :which-key "avy")
     "ESC" '(skrat/load-init-el :which-key "reload")
     "TAB" '(other-window :which-key "other")
     "RET" 'make-frame
-    "b" '(nil :which-key "buffer")
+    "b"  '(nil :which-key "buffer")
     "bb" '(counsel-switch-buffer :which-key "switch")
     "bd" '(kill-buffer :which-key "kill")
     "bj" '(next-buffer :which-key "next")
     "bk" '(previous-buffer :which-key "prev")
-    "f" '(nil :which-key "file")
+    "f"  '(nil :which-key "file")
     "ff" '(counsel-find-file :which-key "find")
-    "r" '(nil :which-key "refactor")
-    "s" '(nil :which-key "symbol")
+    "r"  '(nil :which-key "refactor")
+    "s"  '(nil :which-key "symbol")
     "sj" '(counsel-semantic-or-imenu :which-key "jump")
-    "w" '(nil :which-key "window")
+    "t"  '(nil :which-key "toggle")
+    "t SPC" '(whitespace-mode :which-key "whitespace")
+    "w"  '(nil :which-key "window")
     "w1" '(delete-other-windows :which-key "max")
     "wd" '(delete-window :which-key "kill"))
   (code-def
-    ";" 'comment-line
-    "e" '(nil :which-key "eval")
+    ";"  'comment-line
+    "e"  '(nil :which-key "eval")
     "eb" '(eval-buffer :which-key "buffer")
     "ee" '(eval-last-sexp :which-key "last-sexp")
     "er" '(eval-region :which-key "region")
     "ef" '(eval-defun :which-key "defun")
-    "h" '(nil :which-key "help")
+    "h"  '(nil :which-key "help")
     "hm" 'man
-    "s" '(nil :which-key "symbol")))
+    "s"  '(nil :which-key "symbol")))
 
 (use-package auto-highlight-symbol
   :ensure t
@@ -172,12 +180,21 @@
   (custom-set-faces
    `(ahs-face
      ((t (:background ,(color-lighten-name (face-attribute 'default :background) 10)
-		      :underline nil :foreground nil))))
+          :underline nil :foreground nil))))
    `(ahs-plugin-defalt-face
      ((t (:background ,(face-attribute 'default :background)
-		      :underline nil :foreground nil)))))
+          :underline nil :foreground nil)))))
   (code-def
     "se" '(ahs-edit-mode :which-key "edit")))
+
+(use-package highlight-symbol
+  :ensure t
+  :config
+  (setq highlight-symbol-idle-delay 0)
+  (set-face-attribute
+   'highlight-symbol-face nil :background (face-attribute hl-line-face :background))
+  :hook
+  ((prog-mode-hook . highlight-symbol-mode)))
 
 (use-package ivy
   :ensure t

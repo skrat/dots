@@ -46,6 +46,7 @@
 
 (require 'color)
 (require 'package)
+(require 'dash)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
@@ -105,7 +106,7 @@
   (setq company-idle-delay 0)
   (global-company-mode 1))
 
-(defun counsel-ag-at-point ()
+(defun skrat/counsel-ag-at-point ()
   "Ag symbol at point."
   (interactive)
   (counsel-ag (thing-at-point 'symbol)))
@@ -118,7 +119,7 @@
    ("C-x C-r" . counsel-recentf)   ; search recently edited files
    ("C-c f"   . counsel-git)       ; search for files in git repo
    ("C-c s"   . counsel-git-grep)  ; search for regexp in git repo
-   ("C-c /"   . counsel-ag-at-point) ; search for regexp in git repo using ag
+   ("C-c /"   . skrat/counsel-ag-at-point) ; search for regexp in git repo using ag
    ("C-c l"   . counsel-locate))   ; search for files or else using locate
   )
 
@@ -203,6 +204,10 @@
 (use-package focus
   :ensure t
   :config
+  (general-define-key
+   :modes '(normal)
+   "<tab>" 'focus-next-thing
+   "<backtab>" 'focus-prev-thing)
   (leader-def
     "tf" 'focus-mode))
 
@@ -212,6 +217,8 @@
   (setq highlight-symbol-idle-delay 0)
   (set-face-attribute
    'highlight-symbol-face nil :background (skrat/lighten 'default :background 10))
+  (leader-def
+    "th" '(highlight-symbol-mode :which-key "highlight"))
   :hook
   ((prog-mode-hook . highlight-symbol-mode)))
 
@@ -264,6 +271,11 @@
 (use-package smart-mode-line
   :ensure t
   :config
+  (let ((modes '("Fly.*" "Projectile.*" "PgLn" "ivy" "Anzu" "WK"
+		 "Paredit" "ARev" "EG" "Undo-Tree" "company" "hl-s" "yas")))
+    (setq rm-blacklist
+	  (-> (mapconcat #'identity modes "\\|")
+	      (format "^ \\(%s\\)$"))))
   (smart-mode-line-enable))
 
 (use-package sublimity

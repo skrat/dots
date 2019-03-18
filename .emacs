@@ -241,6 +241,9 @@
 (use-package ivy-hydra
   :ensure t)
 
+(use-package smex
+  :ensure t)
+
 (use-package helpful
   :ensure t
   :config

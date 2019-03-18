@@ -1,4 +1,4 @@
-;;; init --- my emacs configuration
+;;; Init --- my emacs configuration
 ;;; Commentary:
 ;;; Code:
 
@@ -191,7 +191,7 @@
   :config
   (setq fci-rule-color (skrat/lighten 'default :background 10))
   (leader-def
-    "tf" '(fci-mode :which-key "fci")))
+    "tc" '(fci-mode :which-key "fci")))
 
 (use-package evil-anzu
   :ensure t
@@ -199,6 +199,12 @@
   (global-anzu-mode +1)
   (code-def
     "se" '(anzu-query-replace-at-cursor-thing :which-key "edit")))
+
+(use-package focus
+  :ensure t
+  :config
+  (leader-def
+    "tf" 'focus-mode))
 
 (use-package highlight-symbol
   :ensure t

@@ -1,0 +1,164 @@
+xscreensaver.splash: false
+
+!font settings
+xscreensaver.Dialog.headingFont:        -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.bodyFont:           -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.labelFont:          -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.unameFont:          -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.buttonFont:         -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.dateFont:           -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.passwd.passwdFont:         -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+
+!general dialog box (affects main hostname, username, password text)
+xscreensaver.Dialog.foreground:         #ffffff
+xscreensaver.Dialog.background:         #111111
+xscreensaver.Dialog.topShadowColor:     #111111
+xscreensaver.Dialog.bottomShadowColor:  #111111
+xscreensaver.Dialog.Button.foreground:  #666666
+xscreensaver.Dialog.Button.background:  #ffffff
+
+!username/password input box and date text colour
+xscreensaver.Dialog.text.foreground:    #666666
+xscreensaver.Dialog.text.background:    #ffffff
+xscreensaver.Dialog.internalBorderWidth:24
+xscreensaver.Dialog.borderWidth:        20
+xscreensaver.Dialog.shadowThickness:    2
+
+!timeout bar (background is actually determined by Dialog.text.background)
+xscreensaver.passwd.thermometer.foreground:  #ff0000
+xscreensaver.passwd.thermometer.background:  #000000
+xscreensaver.passwd.thermometer.width:       8
+
+!datestamp format--see the strftime(3) manual page for details
+xscreensaver.dateFormat:    %I:%M%P %a %b %d, %Y
+
+!XTerm
+XTerm*faceName: DejaVu Sans Mono Book
+XTerm*faceSize: 8
+XTerm*termName: xterm-256color
+XTerm*locale: true
+XTerm*metaSendsEscape: true
+XTerm*saveLines: 4096
+XTerm*geometry: 140x30+280+300
+
+! --- ~/.Xresources ------------------------------------------------------------
+! ------------------------------------------------------------------------------
+! --- generated with 4bit Terminal Color Scheme Designer -----------------------
+! ------------------------------------------------------------------------------
+! --- http://ciembor.github.com/4bit -------------------------------------------
+! ------------------------------------------------------------------------------
+
+! --- special colors ---
+
+*background: #141414
+*foreground: #FDF4C1
+
+! --- standard colors ---
+
+! black
+*color0: #000000
+
+! bright_black
+*color8: #262626
+
+! red
+*color1: #ff3333
+
+! bright_red
+*color9: #ff9999
+
+! green
+*color2: #33ff33
+
+! bright_green
+*color10: #99ff99
+
+! yellow
+*color3: #ffff33
+
+! bright_yellow
+*color11: #ffff99
+
+! blue
+*color4: #3333ff
+
+! bright_blue
+*color12: #9999ff
+
+! magenta
+*color5: #ff33ff
+
+! bright_magenta
+*color13: #ff99ff
+
+! cyan
+*color6: #33ffff
+
+! bright_cyan
+*color14: #99ffff
+
+! white
+*color7: #d9d9d9
+
+! bright_white
+*color15: #ffffff
+
+
+! ------------------------------------------------------------------------------
+! --- end of terminal colors section -------------------------------------------
+! ------------------------------------------------------------------------------
+
+! -- URxvt settings -- !
+URxvt*cursorColor: #B144A8
+URxvt*scrollBar: false
+URxvt.urlLauncher: chromium
+URxvt*saveLines: 4000
+URxvt.urgentOnBell: True
+URxvt*fading:  30
+
+URxvt.perl-ext-common:      default,clipboard,url-select,keyboard-select,font-size
+URxvt.url-select.launcher:  chromium
+URxvt.url-select.underline: true
+URxvt*iso14755: False
+
+URxvt*scrollTtyOutput:   false
+URxvt*scrollWithBuffer:  true
+URxvt*scrollTtyKeypress: true
+
+! -- URxvt shortcuts -- !
+URxvt.keysym.M-u:           perl:url-select:select_next
+URxvt.keysym.M-Escape:      perl:keyboard-select:activate
+URxvt.keysym.M-s:           perl:keyboard-select:search
+
+URxvt.keysym.M-Shift-Up:   font-size:increase
+URxvt.keysym.M-Shift-Down: font-size:decrease
+URxvt.keysym.M-Shift-BackSpace: font-size:reset
+
+! -- Xft settings -- !
+Xft.dpi:        96
+Xft.antialias:  1
+Xft.rgba:       rgb
+Xft.autohint:   0
+Xft.hinting:    1
+Xft.hintstyle:  hintslight
+Xft.lcdfilter:  lcddefault
+
+! -- Fonts -- !
+URxvt.font:xft:Inconsolata for Powerline:pixelsize=13,xft:DejaVu Sans Mono:pixelsize=13
+URxvt.boldfont:xft:Inconsolata for Powerline:pixelsize=13,xft:xft:DejaVu Sans Mono:pixelsize=13
+URxvt.letterSpace: -1
+
+! ------------------------------------------------------------------------------
+! ROFI Color theme
+! ------------------------------------------------------------------------------
+rofi.color-enabled: true
+rofi.color-window: argb:ef0C1014, #273238, #1e2529
+rofi.color-normal: argb:00273238, #c1c1c1, argb:00273238, #f8e375, #000000
+rofi.color-active: argb:00273238, #80cbc4, argb:00273238, #f8e375, #0e4f49
+rofi.color-urgent: argb:00273238, #ff1844, argb:00273238, #f8e375, #ff1844
+rofi.hide-scrollbar: true
+rofi.separator-style: solid
+rofi.padding: 0
+rofi.location: 1
+rofi.width: 100
+rofi.font: DejaVu Sans Mono 8

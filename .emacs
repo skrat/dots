@@ -163,7 +163,7 @@
     "RET" 'make-frame
     "b"  '(nil :which-key "buffer")
     "bb" '(counsel-switch-buffer :which-key "switch")
-    "bd" '(kill-buffer :which-key "kill")
+    "bd" '(kill-this-buffer :which-key "kill")
     "bj" '(next-buffer :which-key "next")
     "bk" '(previous-buffer :which-key "prev")
     "f"  '(nil :which-key "file")
@@ -251,10 +251,10 @@
     "hh" 'helpful-at-point)
   (evil-define-key 'normal helpful-mode-map "q" 'delete-window))
 
-(use-package page-break-lines
+(use-package form-feed
   :ensure t
   :config
-  (global-page-break-lines-mode +1))
+  (form-feed-mode +1))
 
 (use-package projectile
   :ensure t
@@ -275,17 +275,12 @@
   :ensure t
   :config
   (let ((modes '("Fly.*" "Projectile.*" "PgLn" "ivy" "Anzu" "WK"
-		 "Paredit" "ARev" "EG" "Undo-Tree" "company" "hl-s" "yas")))
+		 "Paredit" "ARev" "EG" "Undo-Tree" "company" "hl-s"
+		 "yas" "^L")))
     (setq rm-blacklist
 	  (-> (mapconcat #'identity modes "\\|")
 	      (format "^ \\(%s\\)$"))))
   (smart-mode-line-enable))
-
-(use-package sublimity
-  :ensure t
-  :config
-  (require 'sublimity-scroll)
-  (sublimity-mode 1))
 
 (use-package swiper
   :ensure t
@@ -365,17 +360,21 @@
 
 (use-package clojure-mode
   :ensure t
-  :hook ((clojure-mode . eldoc-mode)))
+  :hook
+  ((clojure-mode . eldoc-mode)))
 
 (use-package cider
   :ensure t
-  :hook ((cider-repl-mode . eldoc-mode))
+  :hook
+  ((cider-repl-mode . eldoc-mode))
   :config
   (setq cider-prompt-for-symbol nil)
+  (setq cider-save-file-on-load nil)
   (leader-def clojure-mode-map
     "c" '(nil :which-key "cider")
     "ci" '(cider-jack-in-cljs :which-key "jack-in-cljs")
     "cj" '(cider-jack-in :which-key "jack-in")
+    "cn" '(cider-repl-set-ns :which-key "repl-set-ns")
     "cq" '(cider-quit :which-key "quit"))
   (code-def clojure-mode-map
     "eb" '(cider-eval-buffer :which-key "buffer")
@@ -415,7 +414,8 @@
   :ensure t
   :hook ((emacs-lisp-mode . paredit-mode)
 	 (clojure-mode . paredit-mode)
-	 (cider-repl-mode . paredit-mode)))
+	 (cider-repl-mode . paredit-mode)
+	 (eshell-mode . paredit-mode)))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -442,12 +442,18 @@
 (use-package tex
   :ensure auctex)
 
+(use-package latex-preview-pane
+  :ensure t
+  :config
+  (customize-set-variable 'latex-preview-pane-use-frame t))
+
 (use-package tide
   :ensure t
   :after (typescript-mode company flycheck)
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
+         ;(before-save . tide-format-before-save)
+	 ))
 
 (use-package csharp-mode
   :ensure t)

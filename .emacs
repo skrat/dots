@@ -46,7 +46,6 @@
 
 (require 'color)
 (require 'package)
-(require 'dash)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
@@ -97,6 +96,16 @@
 ;; Core
 
 
+(defun skrat/toggle-comment (beg end)
+  "Comment or uncomment thing BEG END."
+  (interactive
+   (if (use-region-p)
+       (list (region-beginning) (region-end))
+     (list nil nil)))
+  (if (and beg end)
+      (comment-or-uncomment-region beg end)
+    (comment-line 1)))
+
 (use-package avy
   :ensure t)
 
@@ -122,6 +131,9 @@
    ("C-c /"   . skrat/counsel-ag-at-point) ; search for regexp in git repo using ag
    ("C-c l"   . counsel-locate))   ; search for files or else using locate
   )
+
+(use-package dash
+  :ensure t)
 
 (use-package evil
   :ensure t
@@ -158,7 +170,7 @@
   (leader-def
     "`"   '(save-buffer :which-key "write")
     "SPC" '(avy-goto-word-or-subword-1 :which-key "avy")
-    "ESC" '(skrat/load-init-el :which-key "reload")
+    "ESC" 'ivy-resume
     "TAB" '(other-window :which-key "other")
     "RET" 'make-frame
     "b"  '(nil :which-key "buffer")
@@ -177,7 +189,7 @@
     "w1" '(delete-other-windows :which-key "max")
     "wd" '(delete-window :which-key "kill"))
   (code-def
-    ";"  'comment-line
+    ";"  '(skrat/toggle-comment :which-key "comment")
     "e"  '(nil :which-key "eval")
     "eb" '(eval-buffer :which-key "buffer")
     "ee" '(eval-last-sexp :which-key "last-sexp")
@@ -363,21 +375,31 @@
   :hook
   ((clojure-mode . eldoc-mode)))
 
+(defun skrat/cider-debug-toggle-insert-state ()
+  "Enter insert mode whenever in CIDER debugger to fix key bindings for evil."
+  (if cider--debug-mode    ;; Checks if you're entering the debugger
+      (evil-insert-state)  ;; If so, turn on evil-insert-state
+    (evil-normal-state)))  ;; Otherwise, turn on normal-state
+
 (use-package cider
   :ensure t
   :hook
-  ((cider-repl-mode . eldoc-mode))
+  ((cider-repl-mode . eldoc-mode)
+   (cider-debug-mode . skrat/cider-debug-toggle-insert-state))
   :config
   (setq cider-prompt-for-symbol nil)
   (setq cider-save-file-on-load nil)
   (leader-def clojure-mode-map
     "c" '(nil :which-key "cider")
+    "ce" '(cider-enlighten-mode :which-key "enlighten")
     "ci" '(cider-jack-in-cljs :which-key "jack-in-cljs")
     "cj" '(cider-jack-in :which-key "jack-in")
     "cn" '(cider-repl-set-ns :which-key "repl-set-ns")
+    "cr" '(cider-ns-refresh :which-key "ns-refresh")
     "cq" '(cider-quit :which-key "quit"))
   (code-def clojure-mode-map
     "eb" '(cider-eval-buffer :which-key "buffer")
+    "ed" '(cider-debug-defun-at-point :which-key "debug-defun")
     "ee" '(cider-eval-sexp-at-point :which-key "sexp-at-point")
     "ef" '(cider-eval-defun-at-point :which-key "defun-at-point")
     "ep" '(cider-pprint-eval-defun-at-point :which-key "pp-defun-at-point")

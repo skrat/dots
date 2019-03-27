@@ -409,7 +409,9 @@
   (general-define-key
    :keymap clojure-mode-map
    "M-RET" 'cider-eval-defun-at-point
-   [(meta shift return)] 'cider-pprint-eval-defun-at-point
+   [(meta shift return)] 'cider-pprint-eval-defun-at-point)
+  (general-define-key
+   :keymap cider-repl-mode-map
    "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
 
 (use-package eval-sexp-fu
@@ -437,7 +439,9 @@
   :hook ((emacs-lisp-mode . paredit-mode)
 	 (clojure-mode . paredit-mode)
 	 (cider-repl-mode . paredit-mode)
-	 (eshell-mode . paredit-mode)))
+	 (eshell-mode . paredit-mode)
+	 (eval-expression-minibuffer-setup-hook . paredit-mode)
+	 (eval-expression-minibuffer-setup-hook . eldoc-mode)))
 
 (use-package rainbow-delimiters
   :ensure t

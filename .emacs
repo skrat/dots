@@ -473,13 +473,27 @@
   :config
   (customize-set-variable 'latex-preview-pane-use-frame t))
 
+(use-package web-mode
+  :ensure t)
+
+(defun skrat/tide-if-tsx ()
+  "Tide mode if filename ends with .tsx."
+  (when (string-equal "tsx" (file-name-extension buffer-file-name))
+    (tide-setup)
+    (eldoc-mode)))
+
 (use-package tide
   :ensure t
   :after (typescript-mode company flycheck)
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
+	 (typescript-mode . eldoc-mode)
+	 (web-mode-hook . skrat/tide-if-tsx)
          ;(before-save . tide-format-before-save)
-	 ))
+	 )
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (flycheck-add-mode 'typescript-tslint 'web-mode))
 
 (use-package csharp-mode
   :ensure t)

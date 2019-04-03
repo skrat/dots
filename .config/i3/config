@@ -203,8 +203,8 @@ bar {
         statusline #CCCCCC
     }
     font pango:DejaVu Sans Mono, FontAwesome 8
-    output primary
-    output HDMI2
+    # output primary
+    # output HDMI2
 }
 
 # Volume keys

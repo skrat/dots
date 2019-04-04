@@ -27,11 +27,6 @@
 (setq vc-follow-symlinks t)
 (setq mouse-autoselect-window t)
 
-(defun skrat/load-init-el ()
-  "Reload init.el configuration."
-  (interactive)
-  (load-file "~/.emacs"))
-
 (setq backup-directory-alist `(("." . "~/.emacs.d/saves")))
 (setq backup-by-copying t)
 

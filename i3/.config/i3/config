@@ -155,7 +155,7 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec ~/.workspace/bin/i3-exit
+bindsym $mod+Shift+e exec ~/.config/i3/bin/i3-exit
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -198,7 +198,7 @@ bindsym $mod+Shift+u border pixel 1
 # finds out, if available)
 bar {
     #status_command i3status --config ~/.i3/status
-    status_command i3blocks -c ~/.i3/blocks
+    status_command i3blocks -c ~/.config/i3/blocks
     colors {
         statusline #CCCCCC
     }
@@ -219,12 +219,12 @@ bindsym --release XF86AudioMute        exec --no-startup-id pkill -RTMIN+10 i3bl
 set $mode_system System (l) lock, (o) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown, (e) eject
 mode "$mode_system" {
     bindsym e exec --no-startup-id ~/.workspace/bin/dmenu_eject, mode "default"
-    bindsym l exec --no-startup-id ~/.i3/bin/exit lock, mode "default"
-    bindsym o exec --no-startup-id ~/.i3/bin/exit logout, mode "default"
-    bindsym s exec --no-startup-id ~/.i3/bin/exit suspend, mode "default"
-    bindsym h exec --no-startup-id ~/.i3/bin/exit hibernate, mode "default"
-    bindsym r exec --no-startup-id ~/.i3/bin/exit reboot, mode "default"
-    bindsym Shift+s exec --no-startup-id ~/.i3/bin/exit shutdown, mode "default"
+    bindsym l exec --no-startup-id ~/.config/i3/bin/exit lock, mode "default"
+    bindsym o exec --no-startup-id ~/.config/i3/bin/exit logout, mode "default"
+    bindsym s exec --no-startup-id ~/.config/i3/bin/exit suspend, mode "default"
+    bindsym h exec --no-startup-id ~/.config/i3/bin/exit hibernate, mode "default"
+    bindsym r exec --no-startup-id ~/.config/i3/bin/exit reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id ~/.config/i3/bin/exit shutdown, mode "default"
 
     # back to normal: Enter or Escape
     bindsym Return mode "default"
@@ -275,4 +275,4 @@ exec --no-startup-id unclutter
 exec --no-startup-id dex ~/.config/autostart/geoclue-demo-agent.desktop
 exec --no-startup-id python2 ~/.workspace/.weechat/python/pyrnotify.py 4321
 exec --no-startup-id autossh -M 20000 -N -R 4321:localhost:4321 struna.me
-exec --no-startup-id xss-lock -- /bin/slock
+exec --no-startup-id xss-lock -- ~/.config/i3/bin/exit lock

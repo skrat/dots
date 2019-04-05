@@ -24,7 +24,7 @@ alias gdf="git difftool --dir-diff"
 alias gcm="git commit -m"
 alias e="emacsclient -n"
 alias s="sudo"
-alias rm="gio trash"
+alias trash="gio trash"
 
 set -gx EDITOR vim
 set -gx VISUAL vim

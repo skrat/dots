@@ -26,6 +26,7 @@
 (setq debug-on-error t)
 (setq vc-follow-symlinks t)
 (setq mouse-autoselect-window t)
+(electric-pair-mode +1)
 
 ;; Backups and autosaves in one location
 
@@ -67,7 +68,8 @@
 (use-package quelpa
   :ensure t
   :init
-  (setq quelpa-self-upgrade-p nil))
+  (setq quelpa-self-upgrade-p nil)
+  (setq quelpa-update-melpa-p nil))
 
 (use-package quelpa-use-package :ensure t)
 
@@ -150,15 +152,18 @@
 (use-package smart-mode-line
   :ensure t
   :config
-  (let ((modes '("Fly.*" "Projectile.*" "PgLn" "ivy" "Anzu" "WK"
-		 "Paredit" "ARev" "EG" "Undo-Tree" "company" "hl-s"
-		 "yas" "^L" "counsel")))
+  (let ((modes '("Fly.*" "Projectile.*" "PgLn" "Anzu" "WK"
+		 "ARev" "EG" "Undo-Tree" "hl-s"
+		 "yas" "^L")))
     (setq rm-blacklist
 	  (-> (mapconcat #'identity modes "\\|")
 	      (format "^ \\(%s\\)$"))))
   (smart-mode-line-enable))
 
 (use-package diminish
+  :ensure t)
+
+(use-package delight
   :ensure t)
 
 (use-package general
@@ -229,6 +234,7 @@
 
 (use-package counsel
   :ensure t
+  :diminish counsel-mode
   :bind*                           ; load counsel when pressed
   (("M-x"     . counsel-M-x)       ; M-x use counsel
    ("C-x C-f" . counsel-find-file) ; C-x C-f use counsel-find-file
@@ -269,7 +275,8 @@
   :custom
   (company-idle-delay 0)
   :config
-  (global-company-mode 1))
+  (global-company-mode 1)
+  :diminish company-mode)
 
 (use-package flycheck
   :config
@@ -408,6 +415,8 @@
 
 (use-package cider
   :after (clojure-mode)
+  :delight
+  (cider-mode " cider")
   :hook
   ((cider-repl-mode-hook . eldoc-mode))
   :config
@@ -454,17 +463,19 @@
     "rtl" '(clojure-thread-last-all :which-key "first-all")))
 
 (use-package paredit
+  :diminish paredit-mode
   :hook
-  ((emacs-lisp-mode-hook . paredit-mode)
-   (clojure-mode-hook    . paredit-mode)
+  ((emacs-lisp-mode      . paredit-mode)
+   (clojure-mode         . paredit-mode)
    (cider-repl-mode-hook . paredit-mode)
    (eshell-mode          . paredit-mode)
    (eval-expression-minibuffer-setup-hook . paredit-mode)
    (eval-expression-minibuffer-setup-hook . eldoc-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((emacs-lisp-mode-hook . rainbow-delimiters-mode)
-	 (clojure-mode-hook    . rainbow-delimiters-mode)))
+  :hook
+  ((emacs-lisp-mode . rainbow-delimiters-mode)
+   (clojure-mode    . rainbow-delimiters-mode)))
 
 ;; Rest
 
@@ -490,11 +501,11 @@
   :mode "\\.\\(html\\|tsx\\)\\'")
 
 (use-package tide
-  :mode "\\.\\(ts\\|tsx\\)\\'"
+  :mode ("\\.\\(ts\\|tsx\\)\\'" . typescript-mode)
   :after (typescript-mode company flycheck)
-  :hook ((typescript-mode-hook . tide-setup)
-         (typescript-mode-hook . tide-hl-identifier-mode)
-	 (typescript-mode-hook . eldoc-mode)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+	 (typescript-mode . eldoc-mode)
 	 (web-mode-hook        . skrat/tide-if-tsx)
          ;(before-save . tide-format-before-save)
 	 )
@@ -506,3 +517,6 @@
 
 (use-package omnisharp
   :mode "\\.cs\\'")
+
+(provide '.emacs)
+;;; .emacs ends here

@@ -29,7 +29,7 @@ separator_block_width=15
 markup=none
 
 [bandwidth]
-command=$HOME/.i3/bin/bandwidth -p 'printf "%.1f / %.1f %s/s\n", rx, wx, unit;'
+command=$HOME/.config/i3/bin/bandwidth -p 'printf "%.1f / %.1f %s/s\n", rx, wx, unit;'
 interval=persist
 markup=pango
 

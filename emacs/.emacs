@@ -55,7 +55,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-;; (package-initialize)
+(package-initialize)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -117,6 +117,11 @@
     (tide-setup)
     (eldoc-mode)))
 
+(defun skrat/tide ()
+  "Setup tide mode."
+  (tide-setup)
+  (eldoc-mode +1))
+
 (defun skrat/toggle-comment (beg end)
   "Comment or uncomment thing BEG END."
   (interactive
@@ -164,7 +169,9 @@
   :ensure t)
 
 (use-package delight
-  :ensure t)
+  :ensure t
+  :delight
+  (eldoc-mode " ♦"))
 
 (use-package general
   :ensure t
@@ -503,10 +510,8 @@
 (use-package tide
   :mode ("\\.\\(ts\\|tsx\\)\\'" . typescript-mode)
   :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-	 (typescript-mode . eldoc-mode)
-	 (web-mode-hook        . skrat/tide-if-tsx)
+  :hook ((typescript-mode . skrat/tide)
+	 (web-mode-hook . skrat/tide-if-tsx)
          ;(before-save . tide-format-before-save)
 	 )
   :config
@@ -516,7 +521,8 @@
   :mode "\\.cs\\'")
 
 (use-package omnisharp
-  :mode "\\.cs\\'")
+  :after (csharp-mode)
+  :hook (csharp-mode . omnisharp-mode))
 
 (provide '.emacs)
 ;;; .emacs ends here

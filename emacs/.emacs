@@ -23,10 +23,12 @@
 (desktop-save-mode 1)
 (recentf-mode 1)
 (show-paren-mode 1)
+(electric-pair-mode 1)
 (setq debug-on-error t)
 (setq vc-follow-symlinks t)
 (setq mouse-autoselect-window t)
-(electric-pair-mode +1)
+(fset 'yes-or-no-p #'y-or-n-p)
+(advice-add 'risky-local-variable-p :override #'ignore)
 
 ;; Backups and autosaves in one location
 
@@ -281,6 +283,7 @@
 (use-package company
   :custom
   (company-idle-delay 0)
+  (company-tooltip-align-annotations 't)
   :config
   (global-company-mode 1)
   :diminish company-mode)
@@ -337,7 +340,7 @@
   :custom-face
   (form-feed-line ((t (:strike-through "#091F2E"))))
   :hook
-  ((emacs-lisp-mode-hook . form-feed-mode)))
+  ((emacs-lisp-mode . form-feed-mode)))
 
 (use-package projectile
   :ensure t
@@ -517,12 +520,13 @@
   :config
   (flycheck-add-mode 'typescript-tslint 'web-mode))
 
-(use-package csharp-mode
-  :mode "\\.cs\\'")
-
 (use-package omnisharp
-  :after (csharp-mode)
-  :hook (csharp-mode . omnisharp-mode))
+  :mode ("\\.cs\\'" . csharp-mode)
+  :after (company flycheck)
+  :hook ((csharp-mode-hook . omnisharp-mode))
+  :config
+  (add-to-list 'company-backends 'company-omnisharp)
+  (setq omnisharp-server-executable-path "/opt/omnisharp-roslyn/OmniSharp.exe"))
 
 (provide '.emacs)
 ;;; .emacs ends here

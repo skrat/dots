@@ -27,6 +27,7 @@
 (setq debug-on-error t)
 (setq vc-follow-symlinks t)
 (setq mouse-autoselect-window t)
+(setq-default indent-tabs-mode nil)
 (fset 'yes-or-no-p #'y-or-n-p)
 (advice-add 'risky-local-variable-p :override #'ignore)
 
@@ -134,9 +135,30 @@
       (comment-or-uncomment-region beg end)
     (comment-line 1)))
 
-(defun skrat/turn-on-highlight-symbol-mode ()
-  "Turn on highlight-symbol-mode."
-  (highlight-symbol-mode +1))
+(defun skrat/flycheck-mode-line-status-text (&optional status)
+  "Get a text describing STATUS for use in the mode line.
+STATUS defaults to `flycheck-last-status-change' if omitted or
+nil."
+  (concat
+   " " flycheck-mode-line-prefix
+   (pcase (or status flycheck-last-status-change)
+     (`not-checked "")
+     (`no-checker "-")
+     (`running (propertize "*" 'face '(:foreground "green")))
+     (`errored (propertize "!" 'face '(:foreground "red")))
+     (`finished
+      (let-alist (flycheck-count-errors flycheck-current-errors)
+        (if (or .error .warning)
+	    (concat
+	     ":"
+	     (if (= 0 (or .error 0)) "0"
+	       (propertize (int-to-string .error) 'face '(:foreground "red")))
+	     "/"
+	     (if (= 0 (or .warning 0)) "0"
+	       (propertize (int-to-string .warning) 'face '(:foreground "yellow"))))
+          "")))
+     (`interrupted ".")
+     `suspicious)))
 
 ;; Core
 
@@ -159,12 +181,12 @@
 (use-package smart-mode-line
   :ensure t
   :config
-  (let ((modes '("Fly.*" "Projectile.*" "PgLn" "Anzu" "WK"
-		 "ARev" "EG" "Undo-Tree" "hl-s"
-		 "yas" "^L")))
-    (setq rm-blacklist
-	  (-> (mapconcat #'identity modes "\\|")
-	      (format "^ \\(%s\\)$"))))
+  ;; (let ((modes '("Fly.*" "Projectile.*" "PgLn" "WK"
+  ;; 		 "ARev" "EG" "Undo-Tree" "hl-s"
+  ;; 		 "yas" "^L")))
+  ;;   (setq rm-blacklist
+  ;; 	  (-> (mapconcat #'identity modes "\\|")
+  ;; 	      (format "^ \\(%s\\)$"))))
   (smart-mode-line-enable))
 
 (use-package diminish
@@ -173,7 +195,9 @@
 (use-package delight
   :ensure t
   :delight
-  (eldoc-mode " ♦"))
+  (eldoc-mode " ♦")
+  (auto-revert-mode)
+  (undo-tree-mode))
 
 (use-package general
   :ensure t
@@ -290,7 +314,10 @@
 
 (use-package flycheck
   :config
-  (global-flycheck-mode +1))
+  (global-flycheck-mode +1)
+  :custom
+  (flycheck-mode-line-prefix "Σ")
+  (flycheck-mode-line '(:eval (skrat/flycheck-mode-line-status-text))))
 
 (use-package fill-column-indicator
   :config
@@ -302,6 +329,7 @@
   :general
   (local-def
    "se" '(anzu-query-replace-at-cursor-thing :which-key "edit"))
+  :diminish anzu-mode
   :config
   (global-anzu-mode +1))
 
@@ -317,13 +345,15 @@
   :general
   (leader-def
     "th" '(highlight-symbol-mode :which-key "highlight"))
+  :delight
+  (highlight-symbol-mode)
   :custom
   (highlight-symbol-idle-delay 0)
   :config
   (set-face-attribute
    'highlight-symbol-face nil :background (skrat/lighten 'default :background 10))
   :hook
-  ((prog-mode-hook . skrat/turn-on-highlight-symbol-mode)))
+  ((prog-mode . highlight-symbol-mode)))
 
 (use-package helpful
   :general
@@ -350,6 +380,8 @@
   :general
   (leader-def
     "p" '(projectile-command-map :which-key "project"))
+  :delight
+  (projectile-mode)
   :config
   (projectile-mode +1))
 
@@ -391,6 +423,7 @@
 
 (use-package diff-hl
   :ensure t
+  :after (magit)
   :hook
   ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
    (magit-refresh-buffer-hook . diff-hl-magit-post-refresh))
@@ -427,8 +460,11 @@
   :after (clojure-mode)
   :delight
   (cider-mode " cider")
+  (cider-auto-test-mode " AT")
   :hook
-  ((cider-repl-mode-hook . eldoc-mode))
+  ((clojure-mode . paredit-mode)
+   (cider-repl-mode-hook . eldoc-mode)
+   (cider-repl-mode-hook . paredit-mode))
   :config
   (setq cider-prompt-for-symbol nil)
   (setq cider-save-file-on-load nil)
@@ -473,12 +509,11 @@
     "rtl" '(clojure-thread-last-all :which-key "first-all")))
 
 (use-package paredit
-  :diminish paredit-mode
+  :delight
+  (paredit-mode " ()")
   :hook
-  ((emacs-lisp-mode      . paredit-mode)
-   (clojure-mode         . paredit-mode)
-   (cider-repl-mode-hook . paredit-mode)
-   (eshell-mode          . paredit-mode)
+  ((emacs-lisp-mode . paredit-mode)
+   (eshell-mode . paredit-mode)
    (eval-expression-minibuffer-setup-hook . paredit-mode)
    (eval-expression-minibuffer-setup-hook . eldoc-mode)))
 

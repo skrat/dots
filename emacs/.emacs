@@ -425,9 +425,6 @@ nil."
 (use-package diff-hl
   :ensure t
   :after (magit)
-  :hook
-  ((magit-post-refresh-hook . diff-hl-magit-post-refresh)
-   (magit-refresh-buffer-hook . diff-hl-magit-post-refresh))
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
@@ -435,6 +432,7 @@ nil."
   (set-face-attribute 'diff-hl-change nil :background (skrat/darken 'diff-hl-change :foreground 50))
   (set-face-attribute 'diff-hl-insert nil :background (skrat/darken 'diff-hl-insert :foreground 30))
   (set-face-attribute 'diff-hl-delete nil :background (skrat/darken 'diff-hl-delete :foreground 30))
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
   :general
   ("M-n" 'diff-hl-next-hunk
    "M-m" 'diff-hl-previous-hunk)
@@ -466,9 +464,10 @@ nil."
   ((clojure-mode . paredit-mode)
    (cider-repl-mode-hook . eldoc-mode)
    (cider-repl-mode-hook . paredit-mode))
-  :config
-  (setq cider-prompt-for-symbol nil)
-  (setq cider-save-file-on-load nil)
+  :custom
+  (cider-prompt-for-symbol nil)
+  (cider-save-file-on-load nil)
+  :general
   (leader-def clojure-mode-map
     "c" '(nil :which-key "cider")
     "ce" '(cider-enlighten-mode :which-key "enlighten")
@@ -486,12 +485,10 @@ nil."
     "er" '(cider-eval-region :which-key "region")
     "hh" '(cider-doc :which-key "doc")
     "hj" '(cider-javadoc :which-key "javadoc"))
-  (general-define-key
-   :keymap clojure-mode-map
+  (:keymaps 'clojure-mode-map
    "M-RET" 'cider-eval-defun-at-point
    [(meta shift return)] 'cider-pprint-eval-defun-at-point)
-  (general-define-key
-   :keymap cider-repl-mode-map
+  (:keymaps 'cider-repl-mode-map
    "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
 
 (use-package eval-sexp-fu
@@ -566,3 +563,4 @@ nil."
 
 (provide '.emacs)
 ;;; .emacs ends here
+(put 'dired-find-alternate-file 'disabled nil)

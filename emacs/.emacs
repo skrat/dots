@@ -28,6 +28,7 @@
 (setq vc-follow-symlinks t)
 (setq mouse-autoselect-window t)
 (setq-default indent-tabs-mode nil)
+(setq eldoc-idle-delay 0.5)
 (fset 'yes-or-no-p #'y-or-n-p)
 (advice-add 'risky-local-variable-p :override #'ignore)
 

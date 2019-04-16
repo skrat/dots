@@ -1,0 +1,9 @@
+package config
+package fish_logo
+package https://github.com/jethrokuan/fzf
+package spark
+package title
+package weather
+package z
+theme default
+theme eclm

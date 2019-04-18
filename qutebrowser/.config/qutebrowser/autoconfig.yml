@@ -61,6 +61,8 @@ settings:
   search.ignore_case:
     global: smart
   statusbar.hide:
+    global: false
+  tabs.background:
     global: true
   tabs.padding:
     global:
@@ -68,3 +70,5 @@ settings:
       left: 5
       right: 5
       top: 2
+  tabs.show:
+    global: multiple

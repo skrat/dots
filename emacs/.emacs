@@ -31,6 +31,7 @@
 (setq eldoc-idle-delay 0.5)
 (fset 'yes-or-no-p #'y-or-n-p)
 (advice-add 'risky-local-variable-p :override #'ignore)
+(put 'dired-find-alternate-file 'disabled nil)
 
 ;; Backups and autosaves in one location
 
@@ -39,6 +40,31 @@
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
 (setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
 (setq backup-by-copying t)
+
+;; Email
+
+(let ((maildir "~/Mail")
+      (mu4edir "/usr/share/emacs/site-lisp/mu4e")
+      (account "dusan@struna.me"))
+  (when (and (file-directory-p maildir)
+             (file-directory-p mu4edir))
+    (add-to-list 'load-path mu4edir)
+    (load-library "mu4e")
+    (require 'mu4e)
+    (setq mu4e-completing-read-function 'ivy-completing-read)
+    (setq mu4e-maildir maildir)
+    (setq mu4e-contexts
+          `(,(make-mu4e-context
+              :name account
+              :match-func (lambda (msg)
+                            (when msg
+                              (string-prefix-p
+                               (concat "/" account)
+                               (mu4e-message-field msg :maildir))))
+              :vars `((mu4e-drafts-folder . ,(concat "/" account "/Drafts"))
+                      (mu4e-sent-folder   . ,(concat "/" account "/Sent"))
+                      (mu4e-trash-folder  . ,(concat "/" account "/Trash"))
+                      (mu4e-refile-folder . ,(concat "/" account "/Archive"))))))))
 
 ;; Customs stuff
 
@@ -115,6 +141,16 @@
   (interactive)
   (gradle-execute "installDebug"))
 
+(defun skrat/ivy-format-function-arrow (cands)
+  "Transform CANDS into a string for minibuffer."
+  (ivy--format-function-generic
+   (lambda (str)
+     (concat "|" (ivy--add-face str 'ivy-current-match)))
+   (lambda (str)
+     (concat " " str))
+   cands
+   "\n"))
+
 (defun skrat/tide-if-tsx ()
   "Tide mode if filename ends with .tsx."
   (when (string-equal "tsx" (file-name-extension buffer-file-name))
@@ -181,14 +217,7 @@ nil."
 
 (use-package smart-mode-line
   :ensure t
-  :config
-  ;; (let ((modes '("Fly.*" "Projectile.*" "PgLn" "WK"
-  ;; 		 "ARev" "EG" "Undo-Tree" "hl-s"
-  ;; 		 "yas" "^L")))
-  ;;   (setq rm-blacklist
-  ;; 	  (-> (mapconcat #'identity modes "\\|")
-  ;; 	      (format "^ \\(%s\\)$"))))
-  (smart-mode-line-enable))
+  :config (smart-mode-line-enable))
 
 (use-package diminish
   :ensure t)
@@ -251,16 +280,27 @@ nil."
 	      ("C-'" . ivy-avy)
 	      ("C-j" . ivy-next-line)
 	      ("C-k" . ivy-previous-line)) ; C-' to ivy-avy
+  :general
+  (leader-def
+    "bb" '(ivy-switch-buffer :which-key "switch"))
   :custom
   (ivy-use-virtual-buffers nil)
   (ivy-ignore-buffers '("\*.+\*"))
   (ivy-height 20)
   (ivy-count-format "(%d/%d) ")
-  (ivy-format-function 'ivy-format-function-arrow)
+  (ivy-format-function 'skrat/ivy-format-function-arrow)
   (ivy-display-style 'fancy))
 
 (use-package ivy-hydra
   :ensure t)
+
+(use-package ivy-rich
+  :ensure t
+  :after (ivy)
+  :init
+  (setq ivy-rich-path-style 'abbrev
+        ivy-virtual-abbreviate 'full)
+  :config (ivy-rich-mode 1))
 
 (use-package smex
   ;; this enabled recent entries in ivy
@@ -279,7 +319,6 @@ nil."
    ("C-c l"   . counsel-locate))   ; search for files or else using locate
   :general
   (leader-def
-    "bb" '(counsel-switch-buffer :which-key "switch")
     "ff" '(counsel-find-file :which-key "find")
     "sj" '(counsel-semantic-or-imenu :which-key "jump"))
   :config
@@ -424,7 +463,6 @@ nil."
 
 (use-package diff-hl
   :ensure t
-  :after (magit)
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
@@ -561,6 +599,8 @@ nil."
   (add-to-list 'company-backends 'company-omnisharp)
   (setq omnisharp-server-executable-path "/opt/omnisharp-roslyn/OmniSharp.exe"))
 
+(use-package json-mode
+  :mode "\\.json\\'")
+
 (provide '.emacs)
 ;;; .emacs ends here
-(put 'dired-find-alternate-file 'disabled nil)

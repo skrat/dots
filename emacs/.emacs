@@ -52,6 +52,8 @@
     (load-library "mu4e")
     (require 'mu4e)
     (setq mu4e-completing-read-function 'ivy-completing-read)
+    (setq mu4e-alert-interesting-mail-query
+          (concat "flag:unread maildir:/" account "/INBOX"))
     (setq mu4e-maildir maildir)
     (setq mu4e-contexts
           `(,(make-mu4e-context
@@ -557,6 +559,17 @@ nil."
   :hook
   ((emacs-lisp-mode . rainbow-delimiters-mode)
    (clojure-mode    . rainbow-delimiters-mode)))
+
+(use-package mu4e-alert
+  :ensure t
+  :after mu4e
+  :init
+  (mu4e-alert-enable-mode-line-display)
+  (defun skrat/refresh-mu4e-alert-mode-line ()
+    (interactive)
+    (mu4e~proc-kill)
+    (mu4e-alert-enable-mode-line-display))
+  (run-with-timer 0 60 'skrat/refresh-mu4e-alert-mode-line))
 
 ;; Rest
 

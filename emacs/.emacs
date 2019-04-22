@@ -43,30 +43,30 @@
 
 ;; Email
 
-(let ((maildir "~/Mail")
-      (mu4edir "/usr/share/emacs/site-lisp/mu4e")
-      (account "dusan@struna.me"))
-  (when (and (file-directory-p maildir)
-             (file-directory-p mu4edir))
-    (add-to-list 'load-path mu4edir)
-    (load-library "mu4e")
-    (require 'mu4e)
-    (setq mu4e-completing-read-function 'ivy-completing-read)
-    (setq mu4e-alert-interesting-mail-query
-          (concat "flag:unread maildir:/" account "/INBOX"))
-    (setq mu4e-maildir maildir)
-    (setq mu4e-contexts
-          `(,(make-mu4e-context
-              :name account
-              :match-func (lambda (msg)
-                            (when msg
-                              (string-prefix-p
-                               (concat "/" account)
-                               (mu4e-message-field msg :maildir))))
-              :vars `((mu4e-drafts-folder . ,(concat "/" account "/Drafts"))
-                      (mu4e-sent-folder   . ,(concat "/" account "/Sent"))
-                      (mu4e-trash-folder  . ,(concat "/" account "/Trash"))
-                      (mu4e-refile-folder . ,(concat "/" account "/Archive"))))))))
+;; (lexical-let* ((maildir "~/Mail")
+;;                (mu4edir "/usr/share/emacs/site-lisp/mu4e")
+;;                (account "dusan@struna.me"))
+;;   (when (and (file-directory-p maildir)
+;;              (file-directory-p mu4edir))
+;;     (add-to-list 'load-path mu4edir)
+;;     (load-library "mu4e")
+;;     (require 'mu4e)
+;;     (setq mu4e-completing-read-function 'ivy-completing-read)
+;;     (setq mu4e-alert-interesting-mail-query
+;;           (concat "flag:unread maildir:/" account "/INBOX"))
+;;     (setq mu4e-maildir maildir)
+;;     (setq mu4e-contexts
+;;           `(,(make-mu4e-context
+;;               :name account
+;;               :match-func (lambda (msg)
+;;                             (when msg
+;;                               (string-prefix-p
+;;                                (concat "/" account)
+;;                                (mu4e-message-field msg :maildir))))
+;;               :vars `((mu4e-drafts-folder . ,(concat "/" account "/Drafts"))
+;;                       (mu4e-sent-folder   . ,(concat "/" account "/Sent"))
+;;                       (mu4e-trash-folder  . ,(concat "/" account "/Trash"))
+;;                       (mu4e-refile-folder . ,(concat "/" account "/Archive"))))))))
 
 ;; Customs stuff
 

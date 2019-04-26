@@ -60,6 +60,8 @@ settings:
     global: true
   search.ignore_case:
     global: smart
+  session.lazy_restore:
+    global: true
   statusbar.hide:
     global: false
   tabs.background:

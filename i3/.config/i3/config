@@ -242,6 +242,7 @@ for_window [class="(?i)Transmission"] floating enable, move position center
 for_window [class="(?i)arandr"] floating enable, move position center
 for_window [title="(?i)Task Manager - Chromium"] floating enable, move position center
 for_window [title="(?i)Color picker"] floating enable, move position center
+for_window [title="(?i)KRuler"] floating enable, move position center
 
 # Startup apps
 exec --no-startup-id compton

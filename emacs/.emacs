@@ -589,6 +589,12 @@ nil."
     (mu4e-alert-enable-mode-line-display))
   (run-with-timer 0 60 'skrat/refresh-mu4e-alert-mode-line))
 
+(use-package highlight
+  :general
+  (local-def
+    "thl" '(hlt-highlight-lines :which-key "highlight line")
+    "thu" '(hlt-unhighlight-region :which-key "unhighlight")))
+
 ;; Rest
 
 

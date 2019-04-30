@@ -1,0 +1,46 @@
+#!/bin/sh
+
+DMENU="$HOME/.workspace/bin/dmenu_mine -p ~"
+DMENU_DB=$HOME/.workspace/bin/dmenu_db
+CACHEDIR=${XDG_CACHE_HOME:-"$HOME/.cache"}
+
+# Choose a cache file
+if [ -d "$CACHEDIR" ]; then
+	CACHE=$CACHEDIR/dmenu_cache
+else
+	CACHE=$HOME/.dmenu_cache
+fi
+
+# Executables and a bit of a $HOME
+menu_normal() {
+	stest -flx $(echo $PATH | tr : ' ') | sort -u
+	find $HOME -maxdepth 1 | grep -v '\.' | sed -e "s|$HOME|~|"
+}
+
+# Use raw input and locate
+menu_locate() {
+	locate $(echo '<' | $DMENU -p "locate:")
+}
+
+menu() {
+	if [ "$1" = "-l" ]; then
+		menu_locate | $DMENU -l 10
+	else
+		menu_normal | $DMENU_DB $CACHE | $DMENU
+	fi
+}
+
+selection_raw=$(menu $@)
+selection=$(echo $selection_raw | sed -e "s|~|$HOME|")
+if [ ! -z "$selection" ]; then
+	# Store the hit in cache DB
+	$DMENU_DB $CACHE $selection_raw
+	if command -v "$selection_raw" >/dev/null 2>&1; then
+		# Execute if it's a command
+		echo "$selection_raw" | ${SHELL:-"/bin/sh"} &
+	else
+		# Open file using XDG handler
+		xdg-open "$selection" &
+	fi
+fi
+

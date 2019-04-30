@@ -1,0 +1,6 @@
+#!/usr/bin/zsh
+mime=$(xdg-mime query filetype $1)
+filename=$(stat --printf=%n $1 | sed -e s/.\*\\///)
+>&2 echo "Uploading $filename..."
+sanitized=$(echo $filename | sed -e s/\\s/-/g)
+curl --upload-file $1 -H "Content-Type: $mime" http://transfer.sh/$sanitized

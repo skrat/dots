@@ -1,0 +1,10 @@
+#!/bin/sh
+
+DMENU="$HOME/.workspace/bin/dmenu_mine -sf #FFFFFF -sb #CC0000 -p eject"
+MEDIA_DIR=/media
+
+mount_point_menu() {
+  ls $MEDIA_DIR | $DMENU
+}
+
+eject $MEDIA_DIR/$(mount_point_menu)

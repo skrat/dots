@@ -1,0 +1,24 @@
+#!/bin/bash
+
+pyrnotify.py 4321 &> /dev/null & autossh -M 0 -R 4321:localhost:4321 -N struna.me &> /dev/null &
+
+SESSION=$USER
+tmux -u -2 new-session -d -s $SESSION
+
+# Setup a window for weechat
+tmux split-window -h
+tmux select-pane -L
+tmux send-keys "mosh renatalackov.com -- tmux attach -t chat" C-m
+
+# Setup a window for ipy
+tmux select-pane -R
+tmux send-keys "clear; ipython" C-m
+tmux set-option allow-rename off
+tmux rename-window io
+
+# Set default window
+tmux select-window -t $SESSION:1
+tmux select-pane -t 0
+
+# Attach to session
+tmux -2 attach-session -t $SESSION

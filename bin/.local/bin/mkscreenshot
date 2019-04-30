@@ -1,0 +1,3 @@
+#!/bin/sh
+# import -window root $HOME/Desktop/screenshot_$(date +'%Y-%m-%d_%H-%M-%S').png
+xfce4-screenshooter

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+WIDTH=1024
+HEIGHT=768
+x11_cmd=x11vnc
+
+if [[ ! -z $(pgrep ${x11_cmd}) ]]; then
+	pkill ${x11_cmd}
+fi
+
+MODE=$(gtf ${WIDTH} ${HEIGHT} 60| egrep -v '#' |  awk '{first = $1; $1 = ""; print $0, first; }')
+MODE_NAME=$(echo ${MODE} | awk '{ print $1}')
+
+OFFSET=$(xrandr | grep LVDS | awk '{ print $3}' | sed 's/\([0-9]*\)\(.*\)/\1/')
+PRIMARY=$(xrandr | grep LVDS | awk '{print $1}')
+VIRTUAL=VIRTUAL1
+
+xrandr --newmode ${MODE} 2> /dev/null
+xrandr --addmode ${VIRTUAL} ${MODE_NAME} 2> /dev/null
+xrandr --output ${VIRTUAL} --right-of ${PRIMARY}
+
+LOG=$HOME/.vnc/x11vnc.log
+
+if [[ ! -f "${LOG}" ]]; then
+	touch ${LOG}
+	chown ${USER}. ${LOG}
+fi
+
+x11vnc -cursor most \
+       -cursorpos \
+       -usepw \
+       -bg \
+       -forever \
+       -display $DISPLAY \
+       -clip "${WIDTH}x${HEIGHT}+${OFFSET}+0" \
+       -o ${LOG}
+
+arandr

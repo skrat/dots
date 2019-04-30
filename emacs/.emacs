@@ -547,7 +547,10 @@ nil."
    "M-RET" 'cider-eval-defun-at-point
    [(meta shift return)] 'cider-pprint-eval-defun-at-point)
   (:keymaps 'cider-repl-mode-map
-   "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer")))
+   "C-l" '(cider-repl-clear-buffer :which-key "clear REPL buffer"))
+  (:keymaps 'cider-popup-buffer-mode-map
+   :modes '(normal)
+   "q" 'delete-window))
 
 (use-package eval-sexp-fu
   :ensure t)

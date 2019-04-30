@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+import sys
+import math
+import time
+import fileinput
+from collections import deque
+from gi.repository import Gtk, GLib
+
+
+class Poly(Gtk.DrawingArea):
+    def __init__(self, data, size, minx, maxx, miny, maxy):
+        Gtk.DrawingArea.__init__(self)
+        self.set_size_request(size, size)
+        self.connect('draw', self.draw_cb)
+        self.size = float(size)
+        self.data = data
+        self.minx = minx
+        self.maxx = maxx
+        self.miny = miny
+        self.maxy = maxy
+        self.init = True
+
+    def draw_cb(self, widget, cr):
+        rect = self.get_allocation()
+        cr.set_source_rgba(1.,1.,1.,1.)
+        cr.paint()
+        if self.init:
+            self.init = False
+            return
+        cr.translate(self.size/2.0, self.size/2.0)
+
+        s = self.size / (max(self.maxx - self.minx, self.maxy - self.miny) * 1.2)
+        cr.scale(s, s)
+        cr.translate(
+            -(self.minx + self.maxx) / 2.0,
+            -(self.miny + self.maxy) / 2.0,
+        )
+
+        cr.set_source_rgba(1.,0.,0., 0.25)
+        cr.set_line_width(6.0/s)
+
+        p = self.data[0]
+        for p2 in self.data[1:]:
+            cr.move_to(*p)
+            cr.line_to(*p2)
+            cr.stroke()
+            p = p2
+
+
+def lerp(a, b, t):
+    return a + t*(b-a)
+
+def lerp2(a, b, t):
+    return [lerp(a[0], b[0], t), lerp(a[1], b[1], t)]
+
+def dist(a, b):
+    x = b[0] - a[0]
+    y = b[1] - a[1]
+    return math.sqrt(x*x + y*y)
+
+
+def main(data, size, interval, pause=0):
+    window = Gtk.Window()
+    window.set_title("What The Polygon")
+
+    frame = Gtk.Frame()
+    window.add(frame)
+
+    x = list(map(lambda p: p[0], data))
+    y = list(map(lambda p: p[1], data))
+    minx = min(x)
+    maxx = max(x)
+    miny = min(y)
+    maxy = max(y)
+
+    p = data[0]
+    ddata = []
+    for p2 in data[1:] + [p]:
+        r = int(dist(p, p2) / max(maxx-minx, maxy-miny) * 200)
+        ddata.append(p)
+        for t in map(lambda ti: ti/r, range(1, r+1)):
+            ddata.append(lerp2(p, p2, t))
+        p = p2
+
+    rdata = list(reversed(ddata))
+    tdata = [rdata.pop()]
+    app = Poly(tdata, size, minx, maxx, miny, maxy)
+    frame.add(app)
+
+    def update():
+        tdata.append(rdata.pop())
+        app.queue_draw_area(0, 0, size, size)
+        if len(rdata):
+            GLib.timeout_add(interval, update)
+
+
+    window.connect_after('destroy', Gtk.main_quit)
+    window.show_all()
+
+    app.queue_draw_area(0, 0, size, size)
+    GLib.timeout_add(pause, update)
+
+    Gtk.main()
+
+if __name__ == '__main__':
+    points = []
+    for line in fileinput.input():
+        points.append(list(map(float, line.strip().split(','))))
+        points[-1][1] *= -1
+    sys.exit(main(points, 700, 30, 1000))

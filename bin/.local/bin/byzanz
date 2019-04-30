@@ -1,0 +1,5 @@
+#!/bin/bash
+duration=${1:-10}
+read -r X Y W H G ID < <(slop -f "%x %y %w %h %g %i")
+byzanz-record -c -d $duration -x $X -y $Y -w $W -h $H screen.gif
+notify-send "Done recording"

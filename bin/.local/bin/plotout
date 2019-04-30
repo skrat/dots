@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+import sys
+import math
+import argparse
+import threading
+import subprocess
+from collections import deque
+from gi.repository import Gtk, GLib
+
+
+class Squareset(Gtk.DrawingArea):
+    def __init__(self, data, dmin, dmax, width, fg, bg):
+        Gtk.DrawingArea.__init__(self)
+        self.set_size_request(width + 2, width)
+        self.connect('draw', self.draw_cb)
+        self.fg = int2rgb(int(fg, 16))
+        self.bg = int2rgb(int(bg, 16))
+        self.data = data
+        self.dmin = dmin
+        self.dmax = dmax
+
+    def draw_cb(self, widget, cr):
+        rect = self.get_allocation()
+        vmax = self.dmax is not None and self.dmax or max(self.data)
+        vmin = self.dmin is not None and self.dmin or min(self.data)
+        vdif = (vmax - vmin) or 1.0
+
+        cr.set_source_rgb(*self.bg)
+        cr.rectangle(0, 0, rect.width, rect.height)
+        cr.fill()
+
+        cr.set_line_width(1)
+        cr.set_source_rgb(*self.fg)
+        for i, v in enumerate(self.data):
+            cr.move_to(i + 1, rect.height - 1)
+            cr.line_to(i + 1, rect.height - ((v - vmin) / vdif) * (rect.height - 2) - 1)
+            cr.stroke()
+
+
+def int2rgb(c):
+    r = (c >> 16) & 255
+    g = (c >> 8) & 255
+    b = c & 255
+    return (r / 255.0, g / 255.0, b / 255.0)
+
+
+def main(args):
+    window = Gtk.Window()
+    window.set_title("Hello World")
+
+    frame = Gtk.Frame()
+    window.add(frame)
+
+    data = deque([args.dmin is not None and args.dmin or 0] * args.width, maxlen=args.width)
+    app = Squareset(data, args.dmin, args.dmax, args.width, args.foreground, args.background)
+    frame.add(app)
+
+    def update():
+        data.append(
+            float(
+                subprocess.check_output(
+                    args.cmd, shell=True, timeout=args.interval).strip()))
+        rect = app.get_allocation()
+        app.queue_draw_area(0, 0, rect.width, rect.height)
+        GLib.timeout_add(args.interval, update)
+
+    GLib.timeout_add(args.interval, update)
+
+    window.connect_after('destroy', Gtk.main_quit)
+    window.show_all()
+    Gtk.main()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-t", "--interval",
+        help="interval command in ms (default 1000)",
+        default="1000",
+        type=int)
+    parser.add_argument(
+        "-min", "--dmin",
+        help="data min value",
+        type=int)
+    parser.add_argument(
+        "-max", "--dmax",
+        help="data max value",
+        type=int)
+    parser.add_argument(
+        "-w", "--width",
+        help="window width (default 100)",
+        default="100",
+        type=int)
+    parser.add_argument(
+        "-fg", "--foreground",
+        help="foreground color",
+        default="0x00FF00")
+    parser.add_argument(
+        "-bg", "--background",
+        help="background color",
+        default="0xFFFFFF")
+    parser.add_argument("cmd", help="command to execute, it should print numerical value")
+    args = parser.parse_args()
+    sys.exit(main(args))

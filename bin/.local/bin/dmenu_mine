@@ -1,0 +1,2 @@
+#!/bin/bash
+dmenu -i -fn DejaVuSansMono-8.5 -sf '#000000' -sb '#F8E375' $@

@@ -639,5 +639,8 @@ nil."
 (use-package json-mode
   :mode "\\.json\\'")
 
+(use-package markdown-mode
+  :mode "\\.md\\'")
+
 (provide '.emacs)
 ;;; .emacs ends here

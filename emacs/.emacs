@@ -361,7 +361,7 @@ nil."
   (which-key-mode)
   :config
   (setq which-key-sort-order 'which-key-key-order-alpha
-        which-key-idle-delay 0.05)
+        which-key-idle-delay 1.0)
   :diminish which-key-mode)
 
 (use-package company

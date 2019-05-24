@@ -408,7 +408,7 @@ nil."
   :delight
   (highlight-symbol-mode)
   :custom
-  (highlight-symbol-idle-delay 0)
+  (highlight-symbol-idle-delay 0.5)
   :config
   (set-face-attribute
    'highlight-symbol-face nil :background (skrat/lighten 'default :background 10))

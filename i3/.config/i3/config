@@ -188,6 +188,11 @@ bar {
     font pango:DejaVu Sans Mono, FontAwesome 8
     # output primary
     # output HDMI2
+    #
+    # colors {
+    #     background #DDDDDD
+    #     statusline #333333
+    # }
 }
 
 # Volume keys
@@ -263,3 +268,4 @@ exec --no-startup-id dex ~/.config/autostart/geoclue-demo-agent.desktop
 exec --no-startup-id python2 ~/.workspace/.weechat/python/pyrnotify.py 4321
 exec --no-startup-id autossh -M 20000 -N -R 4321:localhost:4321 struna.me
 exec --no-startup-id xss-lock -- ~/.config/i3/bin/exit lock
+exec --no-startup-id flashfocus

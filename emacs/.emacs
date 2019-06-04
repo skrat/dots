@@ -308,7 +308,7 @@ nil."
   (ivy-ignore-buffers '("\*.+\*"))
   (ivy-height 20)
   (ivy-count-format "(%d/%d) ")
-  (ivy-format-function 'skrat/ivy-format-function-arrow)
+  ;; (ivy-format-function 'skrat/ivy-format-function-arrow)
   (ivy-display-style 'fancy))
 
 (use-package ivy-hydra
@@ -598,6 +598,8 @@ nil."
     "thl" '(hlt-highlight-lines :which-key "highlight line")
     "thu" '(hlt-unhighlight-region :which-key "unhighlight")))
 
+(use-package yasnippet)
+
 ;; Rest
 
 
@@ -644,6 +646,65 @@ nil."
 
 (use-package markdown-mode
   :mode "\\.md\\'")
+
+;; C++
+
+(use-package rtags
+  :config
+  (setq rtags-completions-enabled t)
+  (setq rtags-autostart-diagnostics t)
+  (rtags-enable-standard-keybindings))
+
+(use-package company-rtags
+  :after (rtags)
+  :config
+  (eval-after-load 'company
+    '(add-to-list
+      'company-backends 'company-rtags)))
+
+(use-package irony
+  :hook ((c++-mode . irony-mode)
+         (c-mode . irony-mode)
+         (irony-mode . irony-cdb-autosetup-compile-options)))
+
+(use-package counsel-irony
+  :after (irony)
+  :preface
+  (defun skrat/irony-mode-hook ()
+    "My irony-mode hook."
+    (irony-eldoc 1)
+    (define-key irony-mode-map
+      [remap completion-at-point] 'counsel-irony)
+    (define-key irony-mode-map
+      [remap complete-symbol] 'counsel-irony))
+  :hook (irony-mode . skrat/irony-mode-hook))
+
+(use-package cmake-mode
+  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+
+(use-package cmake-font-lock
+  :after (cmake-mode)
+  :hook (cmake-mode . cmake-font-lock-activate))
+
+(use-package cmake-ide
+  :after projectile
+  :hook (c++-mode . skrat/cmake-ide-find-project)
+  :preface
+  (defun skrat/cmake-ide-find-project ()
+    "Finds the directory of the project for cmake-ide."
+    (with-eval-after-load 'projectile
+      (setq cmake-ide-project-dir (projectile-project-root))
+      (setq cmake-ide-build-dir (concat cmake-ide-project-dir "build")))
+    (setq cmake-ide-compile-command
+          (concat "cd " cmake-ide-build-dir " && cmake .. && make"))
+    (cmake-ide-load-db))
+
+  (defun skrat/switch-to-compilation-window ()
+    "Switches to the *compilation* buffer after compilation."
+    (other-window 1))
+  :bind ([remap comment-region] . cmake-ide-compile)
+  :init (cmake-ide-setup)
+  :config (advice-add 'cmake-ide-compile :after #'skrat/switch-to-compilation-window))
 
 (provide '.emacs)
 ;;; .emacs ends here

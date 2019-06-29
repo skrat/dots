@@ -509,7 +509,9 @@ nil."
 
 
 (use-package clojure-mode
-  :mode "\\.\\(clj\\|cljs\\|dtm\\|edn\\)\\'"
+  :mode (("\\.clj\\'" . clojure-mode)
+         ("\\.cljs\\'" . clojurescript-mode)
+         ("\\.edn\\'" . clojure-mode))
   :hook
   ((clojure-mode-hook . eldoc-mode)))
 
@@ -653,7 +655,11 @@ nil."
   :config
   (setq rtags-completions-enabled t)
   (setq rtags-autostart-diagnostics t)
-  (rtags-enable-standard-keybindings))
+  (setq rtags-verify-protocol-version nil)
+  (rtags-enable-standard-keybindings)
+  :general
+  (leader-def c-mode-base-map
+    "r" '(rtags-mode-map :which-key "RTags")))
 
 (use-package company-rtags
   :after (rtags)
@@ -663,21 +669,44 @@ nil."
       'company-backends 'company-rtags)))
 
 (use-package irony
+  :preface
+  (defun skrat/irony-mode-hook ()
+    "Blah blah."
+    ;; (define-key irony-mode-map [remap completion-at-point]
+    ;;   'irony-completion-at-point-async)
+    ;; (define-key irony-mode-map [remap complete-symbol]
+    ;;   'irony-completion-at-point-async)
+    )
   :hook ((c++-mode . irony-mode)
          (c-mode . irony-mode)
-         (irony-mode . irony-cdb-autosetup-compile-options)))
+         (irony-mode . irony-cdb-autosetup-compile-options)
+         (irony-mode . skrat/irony-mode-hook))
+  :general
+  (leader-def irony-mode-map
+    "d" '(nil :which-key "debug")
+    "dg" 'gdb
+    "dd" 'gud-break
+    "dx" 'gud-remove
+    "dr" 'gud-run
+    "dc" 'gud-cont
+    "dn" 'gud-next
+    "dl" 'gdb-display-locals-for-thread))
+
+(use-package irony-eldoc
+  :after (irony)
+  :hook (irony-mode . irony-eldoc))
 
 (use-package counsel-irony
   :after (irony)
   :preface
-  (defun skrat/irony-mode-hook ()
+  (defun skrat/counsel-irony-mode-hook ()
     "My irony-mode hook."
-    (irony-eldoc 1)
     (define-key irony-mode-map
       [remap completion-at-point] 'counsel-irony)
     (define-key irony-mode-map
-      [remap complete-symbol] 'counsel-irony))
-  :hook (irony-mode . skrat/irony-mode-hook))
+      [remap complete-symbol] 'counsel-irony)
+    )
+  :hook (irony-mode . skrat/counsel-irony-mode-hook))
 
 (use-package cmake-mode
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
@@ -687,23 +716,24 @@ nil."
   :hook (cmake-mode . cmake-font-lock-activate))
 
 (use-package cmake-ide
-  :after projectile
+  :after (projectile rtags)
   :hook (c++-mode . skrat/cmake-ide-find-project)
   :preface
   (defun skrat/cmake-ide-find-project ()
     "Finds the directory of the project for cmake-ide."
     (with-eval-after-load 'projectile
-      (setq cmake-ide-project-dir (projectile-project-root))
+      ;; (setq cmake-ide-project-dir (projectile-project-root))
       (setq cmake-ide-build-dir (concat cmake-ide-project-dir "build")))
     (setq cmake-ide-compile-command
-          (concat "cd " cmake-ide-build-dir " && cmake .. && make"))
+          (concat "cd " cmake-ide-build-dir
+                  " && cmake .. && make"))
     (cmake-ide-load-db))
-
   (defun skrat/switch-to-compilation-window ()
     "Switches to the *compilation* buffer after compilation."
     (other-window 1))
   :bind ([remap comment-region] . cmake-ide-compile)
-  :init (cmake-ide-setup)
+  :init (progn (require 'rtags)
+               (cmake-ide-setup))
   :config (advice-add 'cmake-ide-compile :after #'skrat/switch-to-compilation-window))
 
 (provide '.emacs)

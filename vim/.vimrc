@@ -42,7 +42,6 @@ set nobackup
 set smartindent
 set smarttab
 set wildignorecase
-set wrap!
 set incsearch
 set hlsearch
 

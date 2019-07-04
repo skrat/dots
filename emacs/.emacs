@@ -81,7 +81,9 @@
                               (string-prefix-p
                                (concat "/" account)
                                (mu4e-message-field msg :maildir))))
-              :vars `((mu4e-drafts-folder . ,(concat "/" account "/Drafts"))
+              :vars `((user-mail-address  . "dusan@struna.me")
+                      (user-full-name     . "Dusan Maliarik")
+                      (mu4e-drafts-folder . ,(concat "/" account "/Drafts"))
                       (mu4e-sent-folder   . ,(concat "/" account "/Sent"))
                       (mu4e-trash-folder  . ,(concat "/" account "/Trash"))
                       (mu4e-refile-folder . ,(concat "/" account "/Archive"))))))))
@@ -396,8 +398,9 @@ nil."
 (use-package focus
   :general
   (:modes '(normal)
-   "<tab>" 'focus-next-thing
-   "<backtab>" 'focus-prev-thing)
+   ;; "<tab>" 'focus-next-thing
+   ;; "<backtab>" 'focus-prev-thing
+   )
   (leader-def
     "tf" 'focus-mode))
 
@@ -651,62 +654,62 @@ nil."
 
 ;; C++
 
-(use-package rtags
-  :config
-  (setq rtags-completions-enabled t)
-  (setq rtags-autostart-diagnostics t)
-  (setq rtags-verify-protocol-version nil)
-  (rtags-enable-standard-keybindings)
-  :general
-  (leader-def c-mode-base-map
-    "r" '(rtags-mode-map :which-key "RTags")))
+;; (use-package rtags
+;;   :config
+;;   (setq rtags-completions-enabled t)
+;;   (setq rtags-autostart-diagnostics t)
+;;   (setq rtags-verify-protocol-version nil)
+;;   (rtags-enable-standard-keybindings)
+;;   :general
+;;   (leader-def c-mode-base-map
+;;     "r" '(rtags-mode-map :which-key "RTags")))
 
-(use-package company-rtags
-  :after (rtags)
-  :config
-  (eval-after-load 'company
-    '(add-to-list
-      'company-backends 'company-rtags)))
+;; (use-package company-rtags
+;;   :after (rtags)
+;;   :config
+;;   (eval-after-load 'company
+;;     '(add-to-list
+;;       'company-backends 'company-rtags)))
 
-(use-package irony
-  :preface
-  (defun skrat/irony-mode-hook ()
-    "Blah blah."
-    ;; (define-key irony-mode-map [remap completion-at-point]
-    ;;   'irony-completion-at-point-async)
-    ;; (define-key irony-mode-map [remap complete-symbol]
-    ;;   'irony-completion-at-point-async)
-    )
-  :hook ((c++-mode . irony-mode)
-         (c-mode . irony-mode)
-         (irony-mode . irony-cdb-autosetup-compile-options)
-         (irony-mode . skrat/irony-mode-hook))
-  :general
-  (leader-def irony-mode-map
-    "d" '(nil :which-key "debug")
-    "dg" 'gdb
-    "dd" 'gud-break
-    "dx" 'gud-remove
-    "dr" 'gud-run
-    "dc" 'gud-cont
-    "dn" 'gud-next
-    "dl" 'gdb-display-locals-for-thread))
+;; (use-package irony
+;;   :preface
+;;   (defun skrat/irony-mode-hook ()
+;;     "Blah blah."
+;;     ;; (define-key irony-mode-map [remap completion-at-point]
+;;     ;;   'irony-completion-at-point-async)
+;;     ;; (define-key irony-mode-map [remap complete-symbol]
+;;     ;;   'irony-completion-at-point-async)
+;;     )
+;;   :hook ((c++-mode . irony-mode)
+;;          (c-mode . irony-mode)
+;;          (irony-mode . irony-cdb-autosetup-compile-options)
+;;          (irony-mode . skrat/irony-mode-hook))
+;;   :general
+;;   (leader-def irony-mode-map
+;;     "d" '(nil :which-key "debug")
+;;     "dg" 'gdb
+;;     "dd" 'gud-break
+;;     "dx" 'gud-remove
+;;     "dr" 'gud-run
+;;     "dc" 'gud-cont
+;;     "dn" 'gud-next
+;;     "dl" 'gdb-display-locals-for-thread))
 
-(use-package irony-eldoc
-  :after (irony)
-  :hook (irony-mode . irony-eldoc))
+;; (use-package irony-eldoc
+;;   :after (irony)
+;;   :hook (irony-mode . irony-eldoc))
 
-(use-package counsel-irony
-  :after (irony)
-  :preface
-  (defun skrat/counsel-irony-mode-hook ()
-    "My irony-mode hook."
-    (define-key irony-mode-map
-      [remap completion-at-point] 'counsel-irony)
-    (define-key irony-mode-map
-      [remap complete-symbol] 'counsel-irony)
-    )
-  :hook (irony-mode . skrat/counsel-irony-mode-hook))
+;; (use-package counsel-irony
+;;   :after (irony)
+;;   :preface
+;;   (defun skrat/counsel-irony-mode-hook ()
+;;     "My irony-mode hook."
+;;     (define-key irony-mode-map
+;;       [remap completion-at-point] 'counsel-irony)
+;;     (define-key irony-mode-map
+;;       [remap complete-symbol] 'counsel-irony)
+;;     )
+;;   :hook (irony-mode . skrat/counsel-irony-mode-hook))
 
 (use-package cmake-mode
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
@@ -715,26 +718,66 @@ nil."
   :after (cmake-mode)
   :hook (cmake-mode . cmake-font-lock-activate))
 
-(use-package cmake-ide
-  :after (projectile rtags)
-  :hook (c++-mode . skrat/cmake-ide-find-project)
+;; (use-package cmake-ide
+;;   :after (projectile rtags)
+;;   :hook (c++-mode . skrat/cmake-ide-find-project)
+;;   :preface
+;;   (defun skrat/cmake-ide-find-project ()
+;;     "Finds the directory of the project for cmake-ide."
+;;     (with-eval-after-load 'projectile
+;;       ;; (setq cmake-ide-project-dir (projectile-project-root))
+;;       (setq cmake-ide-build-dir (concat cmake-ide-project-dir "build")))
+;;     (setq cmake-ide-compile-command
+;;           (concat "cd " cmake-ide-build-dir
+;;                   " && cmake .. && make"))
+;;     (cmake-ide-load-db))
+;;   (defun skrat/switch-to-compilation-window ()
+;;     "Switches to the *compilation* buffer after compilation."
+;;     (other-window 1))
+;;   :bind ([remap comment-region] . cmake-ide-compile)
+;;   :init (progn (require 'rtags)
+;;                (cmake-ide-setup))
+;;   :config (advice-add 'cmake-ide-compile :after #'skrat/switch-to-compilation-window))
+
+;; (use-package eglot
+;;   :ensure t
+;;   :hook ((c++-mode . eglot-ensure)
+;;          (c++-mode . eldoc-mode))
+;;   :config
+;;   (require 'eglot)
+;;   (setq company-backends
+;;         (cons 'company-capf
+;;               (remove 'company-capf company-backends)))
+;;   (add-to-list 'eglot-server-programs '((c++ mode c-mode) . (eglot-cquery "clangd"))))
+
+(use-package counsel-etags
+  :ensure t)
+
+(use-package modern-cpp-font-lock
+  :hook ((c++-mode . modern-c++-font-lock-mode))
+  :diminish modern-c++-font-lock-mode)
+
+(use-package ycmd
+  :hook ((c++-mode . ycmd-mode)
+         (ycmd-mode . ycmd-setup-completion-at-point-function)
+         (ycmd-mode . ycmd-eldoc-setup))
+  :config
+  (require 'ycmd)
+  (require 'ycmd-eldoc)
+  (set-variable 'ycmd-server-command '("python" "/usr/share/ycmd/ycmd"))
+  (set-variable 'ycmd-global-config "/home/skrat/.config/ycm-extra-conf.py")
+  (set-variable 'ycmd-extra-conf-whitelist '("~/Workspace/*" "~/Workspace/renoworks/*" "~/.config/ycm-extra-conf.py"))
   :preface
-  (defun skrat/cmake-ide-find-project ()
-    "Finds the directory of the project for cmake-ide."
-    (with-eval-after-load 'projectile
-      ;; (setq cmake-ide-project-dir (projectile-project-root))
-      (setq cmake-ide-build-dir (concat cmake-ide-project-dir "build")))
-    (setq cmake-ide-compile-command
-          (concat "cd " cmake-ide-build-dir
-                  " && cmake .. && make"))
-    (cmake-ide-load-db))
-  (defun skrat/switch-to-compilation-window ()
-    "Switches to the *compilation* buffer after compilation."
-    (other-window 1))
-  :bind ([remap comment-region] . cmake-ide-compile)
-  :init (progn (require 'rtags)
-               (cmake-ide-setup))
-  :config (advice-add 'cmake-ide-compile :after #'skrat/switch-to-compilation-window))
+  (defun ycmd-setup-completion-at-point-function ()
+    "Setup `completion-at-point-functions' for `ycmd-mode'."
+    (add-hook 'completion-at-point-functions
+              #'ycmd-complete-at-point nil :local)))
+
+(use-package company-ycmd
+  :ensure t
+  :after (ycmd)
+  :config
+  (company-ycmd-setup))
 
 (provide '.emacs)
 ;;; .emacs ends here

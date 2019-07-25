@@ -750,34 +750,46 @@ nil."
 ;;               (remove 'company-capf company-backends)))
 ;;   (add-to-list 'eglot-server-programs '((c++ mode c-mode) . (eglot-cquery "clangd"))))
 
-(use-package counsel-etags
-  :ensure t)
+;; ---
 
-(use-package modern-cpp-font-lock
-  :hook ((c++-mode . modern-c++-font-lock-mode))
-  :diminish modern-c++-font-lock-mode)
+;; (use-package counsel-etags
+;;   :ensure t)
 
-(use-package ycmd
-  :hook ((c++-mode . ycmd-mode)
-         (ycmd-mode . ycmd-setup-completion-at-point-function)
-         (ycmd-mode . ycmd-eldoc-setup))
-  :config
-  (require 'ycmd)
-  (require 'ycmd-eldoc)
-  (set-variable 'ycmd-server-command '("python" "/usr/share/ycmd/ycmd"))
-  (set-variable 'ycmd-global-config "/home/skrat/.config/ycm-extra-conf.py")
-  (set-variable 'ycmd-extra-conf-whitelist '("~/Workspace/*" "~/Workspace/renoworks/*" "~/.config/ycm-extra-conf.py"))
-  :preface
-  (defun ycmd-setup-completion-at-point-function ()
-    "Setup `completion-at-point-functions' for `ycmd-mode'."
-    (add-hook 'completion-at-point-functions
-              #'ycmd-complete-at-point nil :local)))
+;; (use-package modern-cpp-font-lock
+;;   :hook ((c++-mode . modern-c++-font-lock-mode))
+;;   :diminish modern-c++-font-lock-mode)
 
-(use-package company-ycmd
-  :ensure t
-  :after (ycmd)
-  :config
-  (company-ycmd-setup))
+;; (use-package ycmd
+;;   :hook ((c++-mode . ycmd-mode)
+;;          (ycmd-mode . ycmd-setup-completion-at-point-function)
+;;          (ycmd-mode . ycmd-eldoc-setup))
+;;   :config
+;;   (require 'ycmd)
+;;   (require 'ycmd-eldoc)
+;;   (set-variable 'ycmd-server-command '("python" "/usr/share/ycmd/ycmd"))
+;;   (set-variable 'ycmd-global-config "/home/skrat/.config/ycm-extra-conf.py")
+;;   (set-variable 'ycmd-extra-conf-whitelist '("~/Workspace/*" "~/Workspace/renoworks/*" "~/.config/ycm-extra-conf.py"))
+;;   :preface
+;;   (defun ycmd-setup-completion-at-point-function ()
+;;     "Setup `completion-at-point-functions' for `ycmd-mode'."
+;;     (add-hook 'completion-at-point-functions
+;;               #'ycmd-complete-at-point nil :local)))
+
+;; (use-package company-ycmd
+;;   :ensure t
+;;   :after (ycmd)
+;;   :config
+;;   (company-ycmd-setup))
+
+;; ---
+
+(use-package lsp-mode
+  :hook (c++-mode . lsp)
+  :commands lsp)
+
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package company-lsp :commands company-lsp)
+(use-package dap-mode :commands dap-mode)
 
 (provide '.emacs)
 ;;; .emacs ends here

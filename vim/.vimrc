@@ -16,6 +16,7 @@ if dein#load_state('/home/skrat/.cache/dein')
   call dein#add('Shougo/neosnippet-snippets')
   call dein#add('nanotech/jellybeans.vim')
   call dein#add('guns/vim-clojure-static')
+  call dein#add('airblade/vim-gitgutter')
 
   " You can specify revision/branch/tag.
   call dein#add('Shougo/vimshell', { 'rev': '3787e5' })
@@ -33,6 +34,10 @@ if dein#check_install()
 endif
 
 colorscheme jellybeans
+hi Normal ctermbg=none
+hi NonText ctermbg=none
+hi LineNr ctermbg=none
+hi GitGutterDelete guifg=#ff2222 ctermfg=1
 
 set et
 set hidden
@@ -44,6 +49,7 @@ set smarttab
 set wildignorecase
 set incsearch
 set hlsearch
+set updatetime=100
 
 autocmd BufEnter * setlocal cursorline
 

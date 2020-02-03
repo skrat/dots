@@ -38,7 +38,7 @@ set -gx BOOT_JAVA_COMMAND /usr/bin/drip
 set -gx BAT_STYLE plain
 
 # Behold The PATH
-set -U fish_user_paths $HOME/.local/bin
+set -U fish_user_paths $HOME/.local/bin $HOME/.cargo/bin
 
 # OPAM configuration
 . /home/skrat/.opam/opam-init/init.fish > /dev/null 2> /dev/null or true

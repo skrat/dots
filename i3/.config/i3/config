@@ -82,9 +82,9 @@ bindsym $mod+d focus child
 bindsym $mod+x [urgent=latest] focus
 
 # workspace names
-set $ws1 "1:"
-set $ws2 "2:🌎"
-set $ws3 "3:💡"
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -171,11 +171,13 @@ bindsym $mod+r mode "resize"
 # Border style
 new_window pixel 1
 # class                 border  backgr. text    indicator
-client.focused          #4c7899 #285577 #ffffff #2e9ef4
-client.focused_inactive #333333 #5f676a #ffffff #484e50
-client.unfocused        #333333 #222222 #888888 #292d2e
+client.focused          #4c7899 #00A4C1 #ffffff #D160C4
+client.focused_inactive #999999 #CCCCCC #ffffff #D160C4
+client.unfocused        #999999 #CCCCCC #888888 #D160C4
 client.urgent           #2f343a #900000 #ffffff #900000
-client.placeholder      #000000 #0c0c0c #ffffff #000000
+client.placeholder      #FF0000 #ffffff #FF0000
+
+gaps inner 8
 
 bindsym $mod+u border none
 bindsym $mod+Shift+u border pixel 1
@@ -186,13 +188,19 @@ bar {
         statusline #CCCCCC
     }
     font pango:DejaVu Sans Mono, FontAwesome 8
+
     # output primary
     # output HDMI2
-    #
-    # colors {
-    #     background #DDDDDD
-    #     statusline #333333
-    # }
+
+    colors {
+        background #FFFFFF
+        statusline #333333
+        #                  border  backgr. text
+        focused_workspace  #FFFFFF #CCCCCC #333333
+        active_workspace   #FFFFFF #FFFFFF #333333
+        inactive_workspace #FFFFFF #FFFFFF #333333
+        urgent_workspace   #2f343a #900000 #ffffff
+    }
 }
 
 # Volume keys

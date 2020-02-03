@@ -5,6 +5,7 @@
 ;; GUI
 
 
+(load-theme 'tango t)
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
@@ -29,6 +30,7 @@
 (setq mouse-autoselect-window t)
 (setq-default indent-tabs-mode nil)
 (setq eldoc-idle-delay 0.5)
+(setq undo-tree-enable-undo-in-region nil)
 (fset 'yes-or-no-p #'y-or-n-p)
 (advice-add 'risky-local-variable-p :override #'ignore)
 (put 'dired-find-alternate-file 'disabled nil)
@@ -128,10 +130,10 @@
 ;; Theme
 
 
-(use-package gotham-theme
-  :ensure t
-  :config
-  (load-theme 'gotham t))
+;; (use-package gotham-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'gotham t))
 
 (global-hl-line-mode)
 
@@ -198,26 +200,30 @@
   "Get a text describing STATUS for use in the mode line.
 STATUS defaults to `flycheck-last-status-change' if omitted or
 nil."
-  (concat
-   " " flycheck-mode-line-prefix
-   (pcase (or status flycheck-last-status-change)
-     (`not-checked "")
-     (`no-checker "-")
-     (`running (propertize "*" 'face '(:foreground "green")))
-     (`errored (propertize "!" 'face '(:foreground "red")))
-     (`finished
-      (let-alist (flycheck-count-errors flycheck-current-errors)
-        (if (or .error .warning)
-	    (concat
-	     ":"
-	     (if (= 0 (or .error 0)) "0"
-	       (propertize (int-to-string .error) 'face '(:foreground "red")))
-	     "/"
-	     (if (= 0 (or .warning 0)) "0"
-	       (propertize (int-to-string .warning) 'face '(:foreground "yellow"))))
-          "")))
-     (`interrupted ".")
-     `suspicious)))
+  (let-alist (flycheck-count-errors flycheck-current-errors)
+    (let ((statuz (or status flycheck-last-status-change))
+          (prefix (if (and (equal status' `finished)
+                           (> .error 0))
+                      "🗲" flycheck-mode-line-prefix)))
+      (concat
+       " " prefix
+       (pcase statuz
+         (`not-checked "")
+         (`no-checker "-")
+         (`running (propertize "*" 'face '(:foreground "green")))
+         (`errored (propertize "!" 'face '(:foreground "red")))
+         (`finished
+          (if (or .error .warning)
+	      (concat
+	       ":"
+	       (if (= 0 (or .error 0)) "0"
+	         (propertize (int-to-string .error) 'face '(:foreground "red")))
+	       "/"
+	       (if (= 0 (or .warning 0)) "0"
+	         (propertize (int-to-string .warning) 'face '(:foreground "yellow"))))
+            ""))
+         (`interrupted ".")
+         `suspicious)))))
 
 ;; Core
 
@@ -247,9 +253,12 @@ nil."
 (use-package delight
   :ensure t
   :delight
+  (yas-minor-mode " 🔰")
   (eldoc-mode " ♦")
+  (flymake-mode " 🛸")
   (auto-revert-mode)
-  (undo-tree-mode))
+  (undo-tree-mode)
+  (abbrev-mode))
 
 (use-package general
   :ensure t
@@ -378,7 +387,7 @@ nil."
   :config
   (global-flycheck-mode +1)
   :custom
-  (flycheck-mode-line-prefix "Σ")
+  (flycheck-mode-line-prefix "🔃")
   (flycheck-mode-line '(:eval (skrat/flycheck-mode-line-status-text))))
 
 (use-package fill-column-indicator
